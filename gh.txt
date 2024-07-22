@@ -1,0 +1,1 @@
+	int x = g_cl.m_width / 2.f + std::round(add_);
