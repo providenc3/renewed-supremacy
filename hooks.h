@@ -38,7 +38,58 @@ struct Voice_Vader
 };
 
 
+namespace madik_hooks {
+	///bool __fastcall write_user_cmd_delta_to_buffer(
+	///	const std::uintptr_t ecx, const std::uintptr_t edx,
+	///	const int slot, bf_write* const buffer, int from, int to, const bool is_new_cmd
+	///);
+	///inline decltype( &write_user_cmd_delta_to_buffer ) orig_write_user_cmd_delta_to_buffer{};
 
+	bool __fastcall shouldskipanimframe_hk(void* ecx, void* edx);
+	inline decltype(&shouldskipanimframe_hk) o_shouldskipanimframe{};
+
+	// fix issues
+	void __fastcall modify_eye_pos(CCSGOPlayerAnimState* const ecx, const std::uintptr_t edx, vec3_t& eye_pos);
+	inline decltype(&modify_eye_pos) orig_modify_eye_pos{};
+
+	void __fastcall drawprinttext_hk(void* ecx, void* edx, const wchar_t* text, int text_length, void* draw_type);
+	inline decltype(&drawprinttext_hk) o_drawprinttext{};
+
+
+
+	using SendNetMsgFn = bool(__thiscall*)(INetChannel* pNetChan, INetMessage& msg, bool bForceReliable, bool bVoice);
+	inline SendNetMsgFn oSendNetMsg;
+	bool __fastcall SendNetMsg(INetChannel* pNetChan, void* edx, INetMessage& msg, bool bForceReliable, bool bVoice);
+
+	using FnVoiceData = void(__thiscall*)(void*, void*);
+	inline FnVoiceData oVoiceData;
+	void __fastcall hkVoiceData(void* ecx, void* edx, void* msg);
+
+	using FnFireEvents = void(__thiscall*)(void*);
+	inline FnFireEvents oFireEvents;
+	void __fastcall hkFireEvents(void* ecx, void* edx);
+
+
+
+	void __vectorcall CL_Move2(bool bFinalTick, float accumulated_extra_samples);
+	inline decltype(&CL_Move2) oCL_Move;
+
+	//inline vec3_t __fastcall weapon_shoot_pos_hk( void* ecx, void* edx, vec3_t* ang );
+	//inline decltype( &weapon_shoot_pos_hk ) o_weapon_shoot_pos{};
+/*
+* 	void __fastcall packet_end( const std::uintptr_t ecx, const std::uintptr_t edx );
+	inline decltype( &packet_end ) orig_packet_end{};
+
+*
+	// detour
+	void __fastcall RunSimulation( void* this_, void*, int iCommandNumber, CUserCmd* pCmd, size_t local );
+	inline DetourHook_t RunSimulationDetor( RunSimulation );
+
+	void __fastcall PredictionUpdate( void* prediction, void*, int startframe, bool validframe, int incoming_acknowledged, int outgoing_command );
+	inline DetourHook_t PredictionUpdateDetor( PredictionUpdate );
+
+*/
+}
 
 
 struct VoiceDataCustom

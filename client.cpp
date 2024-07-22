@@ -9,7 +9,7 @@ ulong_t __stdcall Client::init( void* arg ) {
 		return 0;
 
 	// welcome the user.
-	g_notify.add( tfm::format( XOR( "Welcome To Family \n" ), g_cl.m_userr ) );
+	g_notify.add( tfm::format( XOR( "Welcome To madikhook \n" ), g_cl.m_userr ) );
 	g_cl.UnlockHiddenConvars();
 
 	return 1;
@@ -29,9 +29,155 @@ void Client::UnlockHiddenConvars()
 }
 
 
+void Client::ClanTag()
+{
+	// lambda function for setting our clantag.
+	auto SetClanTag = [&](std::string tag) -> void {
+		using SetClanTag_t = int(__fastcall*)(const char*, const char*);
+		static auto SetClanTagFn = pattern::find(g_csgo.m_engine_dll, XOR("53 56 57 8B DA 8B F9 FF 15")).as<SetClanTag_t>();
 
+		SetClanTagFn(tag.c_str(), XOR("madikhook"));
+		};
+
+	std::string szClanTag = XOR("madikhook");
+	std::string szSuffix = XOR("");
+	static int iPrevFrame = 0;
+	static bool bReset = false;
+	int iCurFrame = ((int)(g_csgo.m_globals->m_curtime * 2.f)) % (szClanTag.size() * 2);
+
+	if (g_menu.main.misc.clantag.get()) {
+		// are we in a new frame?
+		static auto is_freeze_period = false;
+		if (g_csgo.m_gamerules->m_bFreezePeriod())
+		{
+			if (is_freeze_period)
+			{
+				SetClanTag("vixhook");
+			}
+			is_freeze_period = false;
+			return;
+		}
+
+		is_freeze_period = true;
+
+		if (iPrevFrame != int(g_csgo.m_globals->m_curtime * 2.4) % 27) {
+			switch (int(g_csgo.m_globals->m_curtime * 2.4) % 27) {
+			case 0: {  SetClanTag("madikhook "); break; }
+			case 1: {  SetClanTag("madikhook "); break; }
+			
+			default:;
+			}
+			iPrevFrame = int(g_csgo.m_globals->m_curtime * 3.6) % 18;
+		}
+
+		// do we want to reset after untoggling the clantag?
+		bReset = true;
+	}
+	else {
+		// reset our clantag.
+		if (bReset) {
+			SetClanTag(XOR(""));
+			bReset = false;
+		}
+	}
+}
 
 void Client::DrawHUD() {
+	if (g_menu.main.misc.watermark.get() == 1) { //main
+
+
+		// get time.
+		time_t t = std::time(nullptr);
+		std::ostringstream time;
+		time << std::put_time(std::localtime(&t), ("%H:%M:%S"));
+
+		// get round trip time in milliseconds.
+		int ms = std::max(0, (int)std::round(g_cl.m_latency * 1000.f));
+
+		// get tickrate.
+		int rate = (int)std::round(1.f / g_csgo.m_globals->m_interval);
+
+		std::string text = tfm::format(XOR("madikhook | rtt: %ims | rate: %i | %s"), ms, rate, time.str().data());
+		render::FontSize_t size = render::hud.size(text);
+
+		// background.
+		render::rect_filled(m_width - size.m_width - 20, 10, size.m_width + 10, size.m_height + 2, { 240, 110, 140, 130 });
+
+		// text.
+		render::hud.string(m_width - 15, 10, { 240, 160, 180, 250 }, text, render::ALIGN_RIGHT);
+
+	}
+
+	else if (g_menu.main.misc.watermark.get() == 2) { //clean
+		// colors
+		const auto col_background = Color(15, 15, 15, 200);
+		const auto col_accent = g_menu.main.misc.menu_color.get();
+
+		// get time.
+		time_t t = std::time(nullptr);
+		std::ostringstream time;
+		time << std::put_time(std::localtime(&t), ("%H:%M:%S"));
+
+		// get round trip time in milliseconds.
+		int ms = std::max(0, (int)std::round(g_cl.m_latency * 1000.f));
+
+		// get tickrate.
+		int rate = (int)std::round(1.f / g_csgo.m_globals->m_interval);
+
+		// get fps.
+		int fps = 1.f / g_csgo.m_globals->m_abs_frametime;
+		std::string text = tfm::format(XOR("madikhook [alpha] | delay: %ims | tick: %i | fps: %i | %s"), ms, rate, fps, time.str().data());
+		render::FontSize_t size = render::menu_shade.size(text);
+
+		// background.
+		render::rect_filled(m_width - size.m_width - 18, 10, size.m_width + 8, size.m_height + 8, col_background);
+		render::rect_filled(m_width - size.m_width - 18, 10, size.m_width + 8, 2, col_accent);
+
+		// text.
+		render::menu_shade.string(m_width - 14, 14, { 255, 255, 255, 255 }, tfm::format(XOR(" [beta] | delay: %ims | tick: %i | fps: %i | %s"), ms, rate, fps, time.str().data()), render::ALIGN_RIGHT);
+		render::menu_shade.string(m_width - 14 - render::menu_shade.size(tfm::format(XOR(" [beta] | delay: %ims | tick: %i | fps: %i | %s"), ms, rate, fps, time.str().data())).m_width, 14, col_accent, tfm::format(XOR("hook")), render::ALIGN_RIGHT);
+		render::menu_shade.string(m_width - 14 - render::menu_shade.size(tfm::format(XOR("hook [beta] | delay: %ims | tick: %i | fps: %i | %s"), ms, rate, fps, time.str().data())).m_width, 14, { 255, 255, 255, 255 }, tfm::format(XOR("madik")), render::ALIGN_RIGHT);
+
+
+	}
+	else if (g_menu.main.misc.watermark.get() == 3) { //old sparkhack
+
+		// colors
+		const auto col_background = Color(15, 15, 15, 200);
+		const auto col_accent = g_menu.main.misc.menu_color.get();
+
+
+
+		// get time.
+		time_t t = std::time(nullptr);
+		std::ostringstream time;
+		time << std::put_time(std::localtime(&t), ("%H:%M:%S"));
+
+		// get round trip time in milliseconds.
+		int ms = std::max(0, (int)std::round(g_cl.m_latency * 1000.f));
+
+		// get tickrate.
+		int rate = (int)std::round(1.f / g_csgo.m_globals->m_interval);
+
+		// get fps.
+		int fps = 1.f / g_csgo.m_globals->m_abs_frametime;
+		std::string text = tfm::format(XOR("madikhook | taps: %s | delay: %ims | fps: %i | %s"), g_shots.taps, ms, fps, time.str().data());
+		render::FontSize_t size = render::menu_shade.size(text);
+
+		// background.
+		//render::rect_filled( m_width - size.m_width - 18, 10, size.m_width + 8, size.m_height + 8, col_background );
+		//render::rect_filled( m_width - size.m_width - 18, 10, size.m_width + 8, 2, col_accent );
+
+		// text.
+		render::menu_shade.string(m_width - 5, 5, { 255, 255, 255, 255 }, tfm::format(XOR(" | taps: %s | ping: %ims | fps: %i | %s"), g_shots.taps, ms, fps, time.str().data()), render::ALIGN_RIGHT);
+		render::menu_shade.string(m_width - 5 - render::menu_shade.size(tfm::format(XOR(" | taps: %s | ping: %ims | fps: %i | %s"), g_shots.taps, ms, fps, time.str().data())).m_width, 5, col_accent, tfm::format(XOR("hook")), render::ALIGN_RIGHT);
+		render::menu_shade.string(m_width - 5 - render::menu_shade.size(tfm::format(XOR("hook | taps: %s | ping: %ims | fps: %i | %s"), g_shots.taps, ms, fps, time.str().data())).m_width, 5, { 255, 255, 255, 255 }, tfm::format(XOR("madik")), render::ALIGN_RIGHT);
+	
+	}
+
+}
+
+void Client::DrawHUD3() {
 
 
 	// Check if watermark checkbox is enabled
@@ -277,7 +423,7 @@ void Client::DoMove() {
 	g_movement.Strafe();
 	g_movement.FakeWalk();
 	g_movement.AutoStop();
-	g_movement.quickpeekassist(g_cl.m_cmd, m_strafe_angles.y);
+	g_movement.AutoPeek(g_cl.m_cmd, m_strafe_angles.y);
 	g_movement.FastStop();
 
 	g_aimbot.m_stop_air = false;

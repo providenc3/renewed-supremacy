@@ -16,6 +16,7 @@ namespace callbacks {
 	bool skeleton();
 	bool outofpov();
 	bool soundesp();
+	void servery();
 	bool lbytimeron();
 	bool glowon();
 	bool isbullettracer();

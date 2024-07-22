@@ -195,7 +195,25 @@ void Force_proxy(CRecvProxyData* data, Address ptr, Address out) {
    MH_CreateHook( Address{ target }.as< LPVOID >( ), \
         reinterpret_cast< LPVOID >( &hook ), reinterpret_cast< LPVOID* >( &original ) )
 
+bool ShouldDrawViewModel() {
+
+	Player* local = g_csgo.m_entlist->GetClientEntity< Player* >(g_csgo.m_engine->GetLocalPlayer());
+
+	if (local && local->alive() && local->m_bIsScoped())
+		return g_menu.main.visuals.drawmodelinscope.get();
+
+	return true;
+}
+
+
 void Hooks::init( ) {
+
+	MH_Initialize();
+
+	MH_CreateHook((*reinterpret_cast<LPVOID**>(g_csgo.m_surface))[28u], reinterpret_cast<LPVOID>(&madik_hooks::drawprinttext_hk), reinterpret_cast<LPVOID*>(&madik_hooks::o_drawprinttext));
+	MH_CreateHook(pattern::find(g_csgo.m_client_dll, XOR("55 8B EC 51 57 E8")), &ShouldDrawViewModel, NULL);
+	MH_EnableHook(MH_ALL_HOOKS);
+
 	// hook wndproc.
 	m_old_wndproc = ( WNDPROC )g_winapi.SetWindowLongA( g_csgo.m_game->m_hWindow, GWL_WNDPROC, util::force_cast< LONG >( Hooks::WndProc ) );
 

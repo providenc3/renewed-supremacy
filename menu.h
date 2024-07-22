@@ -586,6 +586,7 @@ public:
 	Checkbox     hitmarker;
 	Checkbox     hitmarker3d;
 	Checkbox     hitmarker_sound;
+	Dropdown hitsounds;
 	MultiDropdown flags_friendly;
 	Slider box_esp_alpha;
 
@@ -744,9 +745,8 @@ public:
 		hitmarker3d.AddShowCallback(callbacks::IsHitmarker);
 		RegisterElement(&hitmarker3d);
 
-		hitmarker_sound.setup(XOR("hitmarker sound"), XOR("hitmarker_sound"));
-		hitmarker_sound.AddShowCallback(callbacks::IsHitmarker);
-		RegisterElement(&hitmarker_sound);
+		hitsounds.setup(XOR("Hitsound"), XOR("hitsounds"), { XOR("Off"), XOR("Arena switch"), XOR("Opera"), XOR("Bameware"), XOR("Dopium"), XOR("Bubble"), XOR("Cod"), XOR("Fatality"), XOR("Pop"), XOR("Neverlose"), XOR("Rust") });
+		RegisterElement(&hitsounds, 1);
 
 		skeleton.setup(XOR("skeleton"), XOR("skeleton"));
 		RegisterElement(&skeleton);
@@ -1041,11 +1041,13 @@ public:
 	Slider        impact_beams_time2;
 	Slider        impact_beams_speed2;
 	Keybind       thirdperson;
+	Slider		  thirdperson_distance;
 	Checkbox bullet_impacts;
 
 	Checkbox	manual_anti_aim_indic;
 	Colorpicker manual_anti_aim_col;
 	Slider       manualaa_alpha;
+	Checkbox drawmodelinscope;
 
 public:
 	void init( ) {
@@ -1207,12 +1209,18 @@ public:
 		fov_scoped.setup(XOR("instant scope"), XOR("fov_scoped"));
 		RegisterElement(&fov_scoped, 1);
 
+		drawmodelinscope.setup(XOR("draw viewmodel in scope"), XOR("drawmodelinscope"));
+		RegisterElement(&drawmodelinscope, 1);
+
 		postprocess.setup(XOR("disable post processing"), XOR("postprocess"));
 		RegisterElement(&postprocess, 1);
 
 		thirdperson.setup(XOR("force thirdperson"), XOR("thirdperson"));
 		thirdperson.SetToggleCallback(callbacks::ToggleThirdPerson);
 		RegisterElement(&thirdperson, 1);
+
+		thirdperson_distance.setup(XOR(" "), XOR("thirdperson_distance"), 50.f, 300.f, false, 0, 150.f, 1.f, XOR(L"°"));
+		RegisterElement(&thirdperson_distance, 1);
 
 		disableteam.setup(XOR("disable rendering of teammates"), XOR("disableteam"));
 		RegisterElement(&disableteam, 1);
@@ -2410,6 +2418,7 @@ public:
 	Checkbox      logdamagedealt;
 	Checkbox      whitelist;
 	Checkbox      clantag;
+	Checkbox killsay;
 	Keybind       fake_latency;
 	Slider		  fake_latency_amt;
 	Keybind       secondary_fake_latency;
@@ -2443,10 +2452,13 @@ public:
 	Checkbox interpolation;
 	Checkbox bodeeeelean;
 	Checkbox sync;
-	Checkbox killsay;
+
 	Checkbox dumper;
 	Dropdown esp_style;
 	Slider   motion_blur;
+	Dropdown servery;
+
+	Dropdown watermark;
 	Slider   aspect;
 
 public:
@@ -2548,16 +2560,22 @@ public:
 		clantag.setup(XOR("clantag spammer"), XOR("clantag"));
 		RegisterElement(&clantag, 1);
 
+		killsay.setup(XOR("killsay"), XOR("killsay"));
+		RegisterElement(&killsay, 1);
+
 
 		killfeed.setup(XOR("persistent killfeed"), XOR("killfeed"));
 		killfeed.SetCallback(callbacks::ToggleKillfeed);
 		RegisterElement(&killfeed);
 
-		DrawHUD.setup(XOR("watermark"), XOR("drawhud"));
-		RegisterElement(&DrawHUD, 1);
+		watermark.setup(XOR("watermark"), XOR("watermark"), { XOR("none"), XOR("default"), XOR("clean"), XOR("old sparkhack") });
+		RegisterElement(&watermark, 1);
 
-		DrawHUD2.setup(XOR("watermark alternative)"), XOR("drawhud"));
-		RegisterElement(&DrawHUD2, 1);
+		//DrawHUD.setup(XOR("watermark"), XOR("drawhud"));
+		//RegisterElement(&DrawHUD, 1);
+
+		//DrawHUD2.setup(XOR("watermark alternative)"), XOR("drawhud"));
+		//RegisterElement(&DrawHUD2, 1);
 
 		esp_style.setup(XOR("indicator style"), XOR("esp_style"), { XOR("default"), XOR("alternative") });
 		RegisterElement(&esp_style, 1);
@@ -2585,6 +2603,8 @@ public:
 
 		menu_color.setup(XOR("menu color"), XOR("menu_color"), { 255, 60, 106 }, &g_gui.m_color);
 		RegisterElement(&menu_color, 1);
+
+		
 
 		motion_blur.setup(XOR("motion blur"), XOR("blur_value"), 0.f, 100.f, true, 0, 1.f, 1, XOR(L"%"));
 		RegisterElement(&motion_blur);
@@ -2646,12 +2666,11 @@ public:
 		save.SetCallback(callbacks::ConfigSave);
 		RegisterElement(&save, 1);
 
-		connect2.setup(XOR("connect to shitserv"));
-		connect2.SetCallback(callbacks::mrx);
-		RegisterElement(&connect2, 1);
+		servery.setup(XOR("server"), XOR("servery"), { XOR("none"), XOR("mrx #1"), XOR("mrx #2"), XOR("mrx #3"), XOR("nexus"), XOR("dics") });
+		RegisterElement(&servery, 1);
 
-		connect.setup(XOR("connect to dicks"));
-		connect.SetCallback(callbacks::emporium);
+		connect.setup(XOR("connect"));
+		connect.SetCallback(callbacks::servery);
 		RegisterElement(&connect, 1);
 	}
 };

@@ -33,44 +33,28 @@ void Grenades::paint() {
 	// setup trace filter for later.
 	filter.SetPassEntity(g_cl.m_local);
 
-// previous point, set to last point.
-	// or actually.. the first point, we are drawing in reverse.
-	vec3_t prev = m_path.front( );
+	static float rot_start = 0.f;
+	rot_start += 0.01f;
 
-	for ( size_t i = 0; i < m_path.size( ); i++ ) {
+	if (rot_start >= 1.f)
+		rot_start = 0.f;
+
+
+	const auto col_accent = g_menu.main.visuals.tracers_color.get();
+	// previous point, set to last point.
+	// or actually.. the first point, we are drawing in reverse.
+	vec3_t prev = m_path.front();
+
+	// iterate and draw path.
+	for (const auto& cur : m_path) {
 		vec2_t screen0, screen1;
 
-		if ( render::WorldToScreen( prev, screen0 ) && render::WorldToScreen( m_path[ i ], screen1 ) ) {
-			Color col = g_menu.main.visuals.tracers_color.get( );
+		if (render::WorldToScreen(prev, screen0) && render::WorldToScreen(cur, screen1))
+			render::line(screen0, screen1, col_accent);
 
-			ang_t trajectory_angles;
-			vec3_t ang_orientation = ( prev - m_path[ i ] );
-
-			math::VectorAngles( ang_orientation, trajectory_angles );
-
-			auto thickness = 0.1f;
-
-			vec3_t mins = vec3_t( 0.f, -thickness, -thickness );
-			vec3_t maxs = vec3_t( ang_orientation.length( ), thickness, thickness );
-
-			render::r_add_glow_box( m_path[ i ], trajectory_angles, mins, maxs, col, 3.f * g_csgo.m_globals->m_frametime );
-
-			if ( i == m_path.size( ) - 1 ) {
-				static float rot_start;
-				rot_start += 0.003f;
-
-				if ( rot_start >= 1.f )
-					rot_start = 0.f;
-			
-				render::rotating_circle_gradient( m_path[i], col, 88, 88, true, rot_start, 0.25f, 0.50f );
-			}
-		}
-
-		prev = m_path[ i ];
+		// store point for next iteration.
+		prev = cur;
 	}
-
-
-	Color dumbo_dagadt;
 
 	// iterate all players.
 	for (int i{ 1 }; i <= g_csgo.m_globals->m_max_clients; ++i) {
@@ -104,30 +88,17 @@ void Grenades::paint() {
 			float damage = 105.f * std::exp(-d * d);
 
 			// scale damage.
+			// scale damage.
 			damage = penetration::scale(player, damage, 1.f, HITGROUP_CHEST);
 
 			// clip max damage.
 			damage = std::min(damage, (player->m_ArmorValue() > 0) ? 57.f : 98.f);
 
 			// better target?
-			if (player->m_iHealth() < damage)
-				dumbo_dagadt = Color(168, 211, 53, 180);
-			else
-				dumbo_dagadt = Color(255, 255, 255, 180);
-
 			if (damage > target.first) {
 				target.first = damage;
 				target.second = player;
 			}
-		}
-		else if (m_id == MOLOTOV || m_id == FIREBOMB) {
-			// is within damage radius?
-			if (delta.length() > 131.f)
-				continue;
-
-			// hardcoded bullshit /shrug
-			target.first = 10.f;
-			target.second = player;
 		}
 	}
 
@@ -139,36 +110,31 @@ void Grenades::paint() {
 		if (!m_bounces.empty())
 			m_bounces.back().color = { 0, 255, 0, 255 };
 
-		if (render::WorldToScreen(prev, screen)) {
-			if (m_id == FIREBOMB || m_id == MOLOTOV) {
-
-				const float flDistance = m_bounces.back().point.Distance(target.second->m_vecOrigin());
-
-				const float flMeters = flDistance * 0.0254f;
-				const float flFeet = flMeters * 3.281f;
-
-				char distance_buf[128] = { };
-				sprintf(distance_buf, XOR("%.1f ft"), flFeet);
-				render::esp2.string(screen.x, screen.y + 5, Color(150, 200, 60, 180), distance_buf, render::ALIGN_CENTER);
-			}
-
-		}
-
-		if (m_id == HEGRENADE) {
-			if (render::WorldToScreen(prev, screen))
-				render::esp2.string(screen.x, screen.y + 5, dumbo_dagadt, tfm::format(XOR("%i"), (int)target.first) + " dmg", render::ALIGN_CENTER);
-		}
+		if (render::WorldToScreen(prev, screen))
+			render::esp.string(screen.x, screen.y + 5, { 255, 255, 255, 0xb4 }, tfm::format(XOR("%i"), (int)target.first), render::ALIGN_CENTER);
 	}
 
-	// render bounces.
 	for (const auto& b : m_bounces) {
 		vec2_t screen;
 
 		if (render::WorldToScreen(b.point, screen))
-			render::rect(screen.x - 2, screen.y - 2, 4, 4, b.color);
-	}
-}
 
+			render::circle(screen.x - 0, screen.y - 0, 2, 4, b.color);
+
+	}
+
+	vec2_t screen;
+	if (m_bounces.empty())
+		return;
+
+	// render last bounce like llama.
+	if (render::WorldToScreen(m_bounces.back().point, screen)) {
+		render::rect_filled(screen.x - 2, screen.y - 2, 3, 3, col_accent);
+		render::rect(screen.x - 3, screen.y - 3, 5, 5, Color(30, 30, 30, 210));
+		render::circle3d(m_bounces.back().point, col_accent, 88, (m_id == FLASHBANG || m_id == DECOY) ? 24 : 144, true, rot_start, 0.25f, 0.25f);
+	}
+
+}
 
 void Grenades::think() {
 	bool attack, attack2;
@@ -184,6 +150,12 @@ void Grenades::think() {
 
 	// validate nade.
 	if (g_cl.m_weapon_type != WEAPONTYPE_GRENADE)
+		return;
+
+	attack = (g_cl.m_cmd->m_buttons & IN_ATTACK);
+	attack2 = (g_cl.m_cmd->m_buttons & IN_ATTACK2);
+
+	if (!attack && !attack2)
 		return;
 
 	m_id = g_cl.m_weapon_id;
@@ -280,7 +252,7 @@ void Grenades::setup() {
 	math::AngleVectors(angle, &forward);
 
 	// set start point to our shoot position.
-	m_start = math::extrapolate_pos(g_cl.m_shoot_pos, g_cl.m_local->m_vecVelocity(), 13, g_csgo.m_globals->m_interval);
+	m_start = g_cl.m_shoot_pos;
 
 	// adjust starting point based on throw power.
 	m_start.z += (m_power * 12.f) - 12.f;

@@ -9,6 +9,7 @@ namespace render {
 	Font esp_small2;;
 	Font esp_name;;
 	Font esp_other;;
+	Font warning;;
 	Font hud;;
 	Font cs;;
 	Font indicator;;
@@ -33,8 +34,59 @@ void render::init() {
 	indicator2 = Font(XOR("Bahnschrift"), 28, FW_MEDIUM, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
 	console = Font(XOR("Lucida Console"), 10, FW_DONTCARE, FONTFLAG_DROPSHADOW);
 	output = Font(XOR("Verdana"), 12, FW_BOLD, FONTFLAG_OUTLINE);
+	warning = Font(XOR("undefeated"), 22, FW_SEMIBOLD, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
 }
 
+void render::circle3d(vec3_t pos, Color color, int point_count, float radius, bool fade, float rot_start, float fade_start, float fade_length)
+{
+	float step = math::pi * 2.0f / point_count;
+	std::vector<vec3_t> points3d;
+
+	int alpha = 255;
+	int fade_start_point = 0;
+	int fade_end_point = 0;
+	int fade_step = 0;
+
+	if (fade)
+	{
+		fade_start_point = (int)(point_count * fade_start);
+		fade_end_point = fade_start_point + (int)(point_count * fade_length);
+		fade_step = 255 / (fade_end_point - fade_start_point);
+	}
+
+	Color outer_color = Color(0, 0, 0, 255);
+	Color inner_color = color;
+
+	for (int i = 0; i < point_count; i++)
+	{
+		if (fade && i > fade_end_point)
+			break;
+
+		float theta = (i * step) - (math::pi * 2.f * rot_start);
+
+		vec3_t world_start(radius * cosf(theta) + pos.x, radius * sinf(theta) + pos.y, pos.z);
+		vec3_t world_end(radius * cosf(theta + step) + pos.x, radius * sinf(theta + step) + pos.y, pos.z);
+
+		vec2_t start, end;
+		if (!WorldToScreen(world_start, start) || !WorldToScreen(world_end, end))
+			return;
+
+		if (fade && i >= fade_start_point)
+		{
+			alpha -= fade_step;
+
+			if (alpha < 0)
+				alpha = 0;
+		}
+
+		outer_color.a() = alpha;
+		inner_color.a() = alpha;
+
+		render::line(start.x, start.y + 1, end.x, end.y + 1, outer_color);
+		render::line(start.x, start.y - 1, end.x, end.y - 1, outer_color);
+		render::line(start.x, start.y, end.x, end.y, inner_color);
+	}
+}
 
 bool render::WorldToScreen( const vec3_t& world, vec2_t& screen ) {
 	float w;

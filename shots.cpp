@@ -1,4 +1,10 @@
+
 #include "includes.h"
+#include "hitsounds.h"
+#include "playsoundapi.h"
+#pragma comment(lib, "urlmon.lib")
+#pragma comment(lib, "Winmm.lib")
+#pragma comment( lib, "Iphlpapi.lib" )
 
 Shots g_shots{ };
 
@@ -210,9 +216,24 @@ void Shots::OnHurt(IGameEvent* evt) {
 	g_visuals.m_hit_end = g_visuals.m_hit_start + g_visuals.m_hit_duration;
 
 	// hitsound.
-	if (g_menu.main.players.hitmarker_sound.get()) {
-		g_csgo.m_sound->EmitAmbientSound(XOR("buttons/arena_switch_press_02.wav"), 1.f);
+	switch (g_menu.main.players.hitsounds.get() % 100) {
+	case 0: break;
+	case 1: g_csgo.m_sound->EmitAmbientSound(XOR("buttons/arena_switch_press_02.wav"), 3.0f); break;
+	case 2: PlaySoundA(reinterpret_cast<char*>(opera), nullptr, SND_ASYNC | SND_MEMORY); break;
+	case 3: PlaySoundA(reinterpret_cast<char*>(bameware), nullptr, SND_ASYNC | SND_MEMORY); break;
+	case 4: PlaySoundA(reinterpret_cast<char*>(evilsound), nullptr, SND_ASYNC | SND_MEMORY); break;
+	case 5: PlaySoundA(reinterpret_cast<char*>(bubble), nullptr, SND_ASYNC | SND_MEMORY); break;
+	case 6: PlaySoundA(reinterpret_cast<char*>(cod), nullptr, SND_ASYNC | SND_MEMORY); break;
+	case 7: PlaySoundA(reinterpret_cast<char*>(fatality), nullptr, SND_ASYNC | SND_MEMORY); break;
+	case 8: PlaySoundA(reinterpret_cast<char*>(pop), nullptr, SND_ASYNC | SND_MEMORY); break;
+	case 9: PlaySoundA(reinterpret_cast<char*>(neverlose), nullptr, SND_ASYNC | SND_MEMORY); break;
+	case 10: switch (g_csgo.RandomInt(1, 2)) {
+		case 1: PlaySoundA(reinterpret_cast<char*>(rustloudworkingwav), nullptr, SND_ASYNC | SND_MEMORY); break;
+		case 2: PlaySoundA(reinterpret_cast<char*>(cod), nullptr, SND_ASYNC | SND_MEMORY); break;
+		}
 	}
+
+	
 
 	if (g_menu.main.misc.logdamagedealt.get()) {
 		std::string out = tfm::format(XOR("hit %s in the %s for %i damage (%i health remaining)\n"), name, m_groups[group], (int)damage, hp);

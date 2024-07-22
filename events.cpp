@@ -338,35 +338,21 @@ void events::player_death( IGameEvent* evt ) {
 
 			switch (rand() % 12) {
 			case 0:
-				g_csgo.m_engine->ExecuteClientCmd(XOR("effortless"));
+				g_csgo.m_engine->ExecuteClientCmd("say god i wish i had madikhook");
 				break;
+
 			case 1:
-				g_csgo.m_engine->ExecuteClientCmd(XOR("1 by boberhook"));
+
+				g_csgo.m_engine->ExecuteClientCmd("say by madikhook");
 				break;
+
 			case 2:
-				g_csgo.m_engine->ExecuteClientCmd(XOR("am i cringe?"));
+
+				g_csgo.m_engine->ExecuteClientCmd("say im madikhook user btw");
 				break;
-			case 3:
-				g_csgo.m_engine->ExecuteClientCmd(XOR("fucking bot"));
-				break;
-			case 4:
-				g_csgo.m_engine->ExecuteClientCmd(XOR("by hollywood015"));
-				break;
-			case 5:
-				g_csgo.m_engine->ExecuteClientCmd(XOR("i wanna eat some negurt"));
-				break;
-			case 6:
-				g_csgo.m_engine->ExecuteClientCmd(XOR("1"));
-				break;
-			case 7:
-				g_csgo.m_engine->ExecuteClientCmd(XOR("free robux"));
-				break;
-			case 8:
-				g_csgo.m_engine->ExecuteClientCmd(XOR("i stole ur robux"));
-				break;
-			
+
 			}
-			
+
 		}
 	}
 }

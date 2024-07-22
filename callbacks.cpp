@@ -117,6 +117,33 @@ bool callbacks::IsChamsSelection1() {
 	return g_menu.main.players.chams_entity_selection.get() == 1;
 }
 
+void callbacks::servery() {
+	switch (g_menu.main.misc.servery.get()) {
+	case 1: {
+		g_csgo.m_engine->ExecuteClientCmd("connect 178.32.80.148:27015");
+		break;
+	}
+	case 2: {
+		g_csgo.m_engine->ExecuteClientCmd("connect 178.32.80.148:27030");
+		break;
+	}
+	case 3: {
+		g_csgo.m_engine->ExecuteClientCmd("connect 178.32.80.148:27031");
+		break;
+	}
+	case 4: {
+		g_csgo.m_engine->ExecuteClientCmd("connect 198.251.88.210:27015");
+		break;
+	}
+	case 5: {
+		g_csgo.m_engine->ExecuteClientCmd("connect na.2018hvh.com");
+		break;
+	}
+	default:
+		break;
+	}
+}
+
 bool callbacks::EnemyGlowChamsSelection()
 {
 	return g_menu.main.players.chams_entity_selection.get() == 1 && g_menu.main.players.chams_enemy_mat.get() == 4;

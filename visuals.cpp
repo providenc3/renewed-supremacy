@@ -82,7 +82,8 @@ auto clean_item_name = [](const char* name) -> const char*
 		return name;
 	};
 
-void Visuals::ThirdpersonThink() {
+void Visuals::ThirdpersonThink()
+{
 	ang_t                          offset;
 	vec3_t                         origin, forward;
 	static CTraceFilterSimple_game filter{ };
@@ -96,18 +97,21 @@ void Visuals::ThirdpersonThink() {
 	bool alive = g_cl.m_local && g_cl.m_local->alive();
 
 	// camera should be in thirdperson.
-	if (m_thirdperson) {
+	if (m_thirdperson)
+	{
 
 		// if alive and not in thirdperson already switch to thirdperson.
 		if (alive && !g_csgo.m_input->CAM_IsThirdPerson())
 			g_csgo.m_input->CAM_ToThirdPerson();
 
 		// if dead and spectating in firstperson switch to thirdperson.
-		else if (g_cl.m_local->m_iObserverMode() == 4) {
+		else if (g_cl.m_local->m_iObserverMode() == 4)
+		{
 
 			// if in thirdperson, switch to firstperson.
 			// we need to disable thirdperson to spectate properly.
-			if (g_csgo.m_input->CAM_IsThirdPerson()) {
+			if (g_csgo.m_input->CAM_IsThirdPerson())
+			{
 				g_csgo.m_input->CAM_ToFirstPerson();
 				g_csgo.m_input->m_camera_offset.z = 0.f;
 			}
@@ -117,13 +121,15 @@ void Visuals::ThirdpersonThink() {
 	}
 
 	// camera should be in firstperson.
-	else if (g_csgo.m_input->CAM_IsThirdPerson()) {
+	else if (g_csgo.m_input->CAM_IsThirdPerson())
+	{
 		g_csgo.m_input->CAM_ToFirstPerson();
 		g_csgo.m_input->m_camera_offset.z = 0.f;
 	}
 
 	// if after all of this we are still in thirdperson.
-	if (g_csgo.m_input->CAM_IsThirdPerson()) {
+	if (g_csgo.m_input->CAM_IsThirdPerson())
+	{
 		// get camera angles.
 		g_csgo.m_engine->GetViewAngles(offset);
 
@@ -131,7 +137,7 @@ void Visuals::ThirdpersonThink() {
 		math::AngleVectors(offset, &forward);
 
 		// cam_idealdist convar.
-		offset.z = g_csgo.m_cvar->FindVar(HASH("cam_idealdist"))->GetFloat();
+		offset.z = g_menu.main.visuals.thirdperson_distance.get();
 
 		// start pos.
 		origin = g_cl.m_shoot_pos;
@@ -153,6 +159,7 @@ void Visuals::ThirdpersonThink() {
 		// override camera angles.
 		g_csgo.m_input->m_camera_offset = { offset.x, offset.y, offset.z };
 	}
+
 }
 
 constexpr int linesize = 8, linedec = 4;
@@ -201,16 +208,6 @@ void Visuals::hitmarker_world() {
 	if (hitmarkers.size() == 0)
 		return;
 
-	if (!g_cl.m_processing || !g_csgo.m_engine->IsInGame()) {
-		if (!m_impacts.empty())
-			m_impacts.clear();
-
-		if (!hitmarkers.empty())
-			hitmarkers.clear();
-
-		return;
-	}
-
 	// draw
 	for (int i = 0; i < hitmarkers.size(); i++) {
 		vec3_t pos3D = vec3_t(hitmarkers[i].impact.x, hitmarkers[i].impact.y, hitmarkers[i].impact.z);
@@ -219,30 +216,19 @@ void Visuals::hitmarker_world() {
 		if (!render::WorldToScreen(pos3D, pos2D))
 			continue;
 
-		if (vec3_t(hitmarkers[i].impact.x, hitmarkers[i].impact.y, hitmarkers[i].impact.z).IsZero())
-			continue;
+		int r = 255;
+		int g = 255;
+		int b = 255;
 
-		float complete = (g_csgo.m_globals->m_curtime - m_hit_start) / m_hit_duration;
-		int x = g_cl.m_width,
-			y = g_cl.m_height,
-			alpha = (1.f - complete) * 240;
-
-		auto color = Color(240, 240, 240, hitmarkers[i].alpha);
-
-		if (g_shots.iHeadshot)
-			color = Color(255, 0, 0, hitmarkers[i].alpha);
-		else
-			color;
-
-		render::line(pos2D.x + linesize, pos2D.y + linesize, pos2D.x + linedec, pos2D.y + linedec, color);
-		render::line(pos2D.x - linesize, pos2D.y - linesize, pos2D.x - linedec, pos2D.y - linedec, color);
-		render::line(pos2D.x + linesize, pos2D.y - linesize, pos2D.x + linedec, pos2D.y - linedec, color);
-		render::line(pos2D.x - linesize, pos2D.y + linesize, pos2D.x - linedec, pos2D.y + linedec, color);
+		render::line(pos2D.x + 2, pos2D.y + 2, pos2D.x + 7, pos2D.y + 7, { r, g, b, hitmarkers[i].alpha });
+		render::line(pos2D.x - 2, pos2D.y - 2, pos2D.x - 7, pos2D.y - 7, { r, g, b, hitmarkers[i].alpha });
+		render::line(pos2D.x + 2, pos2D.y - 2, pos2D.x + 7, pos2D.y - 7, { r, g, b, hitmarkers[i].alpha });
+		render::line(pos2D.x - 2, pos2D.y + 2, pos2D.x - 7, pos2D.y + 7, { r, g, b, hitmarkers[i].alpha });
 	}
 
-	// proceeed
+	// proceed
 	for (int i = 0; i < hitmarkers.size(); i++) {
-		if (hitmarkers[i].time + 0.1f <= g_csgo.m_globals->m_curtime) {
+		if (hitmarkers[i].time + 1.25f <= g_csgo.m_globals->m_curtime) {
 			hitmarkers[i].alpha -= 1;
 		}
 

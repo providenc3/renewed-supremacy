@@ -34,13 +34,15 @@ public:
 	void EndMove(CUserCmd* cmd);
 	void BackupPlayers(bool restore);
 	void DoMove();
-	void DrawHUD();
 	void DrawHUD2();
+	void DrawHUD3();
 	void UpdateInformation();
 	void MouseFix(CUserCmd* cmd);
 	void SetAngles();
+	void DrawHUD();
 	void OnCreateMove();
 	void KillFeed();
+	void ClanTag();
 	void OnPaint();
 	void OnMapload();
 	void OnTick(CUserCmd* cmd);

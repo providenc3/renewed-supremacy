@@ -6,7 +6,7 @@ void IEngineTrace::TraceLine(const vec3_t& src, const vec3_t& dst, int mask, IHa
     std::uintptr_t filter[4] = { *reinterpret_cast<std::uintptr_t*>(trace_filter_simple), reinterpret_cast<std::uintptr_t>(entity), collision_group, 0 };
 
     TraceRay(Ray(src, dst), mask, reinterpret_cast<CTraceFilter*>(&filter), trace);
-}   
+}
 
 void IEngineTrace::TraceHull(const vec3_t& src, const vec3_t& dst, const vec3_t& mins, const vec3_t& maxs, int mask, IHandleEntity* entity, int collision_group, CGameTrace* trace) {
     static auto trace_filter_simple = pattern::find(g_csgo.m_client_dll, XOR("55 8B EC 83 E4 F0 83 EC 7C 56 52")) + 0x3D;
@@ -108,6 +108,43 @@ void DrawBeamPaw(vec3_t src, vec3_t end, Color color)
         g_csgo.m_beams->DrawBeam(myBeam);
 }
 
+void draw_arc(int x, int y, int radius, int start_angle, int percent, int thickness, Color color)
+{
+    auto precision = (2 * 3.14159265358979323846) / 30;
+    auto step = 3.14159265358979323846 / 180;
+    auto inner = radius - thickness;
+    auto end_angle = (start_angle + percent) * step;
+    auto start_angles = (start_angle * 3.14159265358979323846) / 180;
+
+    for (; radius > inner; --radius) {
+        for (auto angle = start_angles; angle < end_angle; angle += precision) {
+            auto cx = std::round(x + radius * std::cos(angle));
+            auto cy = std::round(y + radius * std::sin(angle));
+
+            auto cx2 = std::round(x + radius * std::cos(angle + precision));
+            auto cy2 = std::round(y + radius * std::sin(angle + precision));
+
+            render::line(cx, cy, cx2, cy2, color);
+        }
+    }
+}
+
+const char* index_to_grenade_name_icon(int index)
+{
+
+
+    switch (index)
+    {
+    case SMOKE: return "k"; break;
+    case HEGRENADE: return "j"; break;
+    case MOLOTOV:return "l"; break;
+    case 48:return "n"; break;
+    }
+
+
+    return "";
+}
+
 bool c_grenade_prediction::data_t::draw() const
 {
     if (!g_menu.main.visuals.grenade_path.get())
@@ -115,6 +152,8 @@ bool c_grenade_prediction::data_t::draw() const
 
     if (m_path.size() <= 1u || g_csgo.m_globals->m_curtime >= m_expire_time)
         return false;
+
+    int dist = g_cl.m_local->m_vecOrigin().dist_to(m_origin) / 12;
 
     auto prev_screen = vec2_t();
     auto prev_on_screen = render::WorldToScreen(std::get< vec3_t >(m_path.front()), prev_screen);
@@ -137,6 +176,78 @@ bool c_grenade_prediction::data_t::draw() const
 
         prev_screen = cur_screen;
         prev_on_screen = cur_on_screen;
+    }
+    float percent = ((m_expire_time - g_csgo.m_globals->m_curtime) / game::TICKS_TO_TIME(m_tick));
+    int alpha_damage = 0;
+
+    if (m_index == HEGRENADE && dist <= 20) {
+        alpha_damage = 50 - 255 * (dist / 20);
+    }
+
+    if ((m_index == MOLOTOV || m_index == FIREBOMB) && dist <= 15) {
+        alpha_damage = 50 - 255 * (dist / 15);
+    }
+
+    auto icon = index_to_grenade_name_icon(m_index);
+
+    Color colorkurwa = g_menu.main.visuals.grenade_path_col.get();
+
+    //if (dist < 150) {
+    render::circle(prev_screen.x, prev_screen.y, 20, 360, Color(26, 26, 30, 200));
+    draw_arc(prev_screen.x, prev_screen.y, 20, 0, 360 * percent, 2, colorkurwa);
+    render::warning.string(prev_screen.x, prev_screen.y - render::warning.size(icon).m_height / 2.f, { 255,255,255,255 }, icon, render::ALIGN_CENTER);
+    // }
+
+    auto is_on_screen = [](vec3_t origin, vec2_t& screen) -> bool
+        {
+            if (!render::WorldToScreen(origin, screen))
+                return false;
+
+            return (screen.x > 0 && screen.x < g_cl.m_width) && (g_cl.m_height > screen.y && screen.y > 0);
+        };
+
+    vec2_t screenPos;
+    vec3_t vEnemyOrigin = m_origin;
+    vec3_t vLocalOrigin = g_cl.m_local->GetAbsOrigin();
+    if (!g_cl.m_local->alive())
+        vLocalOrigin = g_csgo.m_input->m_camera_offset;
+
+    if (!is_on_screen(vEnemyOrigin, screenPos))
+    {
+        const float wm = g_cl.m_width / 2, hm = g_cl.m_height / 2;
+        vec3_t last_pos = std::get< vec3_t >(m_path.at(m_path.size() - 1));
+
+        ang_t dir;
+
+        g_csgo.m_engine->GetViewAngles(dir);
+
+        float view_angle = dir.y;
+
+        if (view_angle < 0)
+            view_angle += 360;
+
+        view_angle = DEG2RAD(view_angle);
+
+        auto entity_angle = math::CalcAngle(vLocalOrigin, vEnemyOrigin);
+        entity_angle.normalize();
+
+        if (entity_angle.y < 0.f)
+            entity_angle.y += 360.f;
+
+        entity_angle.y = DEG2RAD(entity_angle.y);
+        entity_angle.y -= view_angle;
+
+        auto position = vec2_t(wm, hm);
+        position.x -= std::clamp(vLocalOrigin.dist_to(vEnemyOrigin), 400.f, hm - 40);
+
+        rotate_point(position, vec2_t(wm, hm), false, entity_angle.y);
+
+        if (dist < 45) {
+            render::circle(position.x, position.y, 20, 360, Color(26, 26, 30, 200));
+            draw_arc(position.x, position.y, 20, 0, 360 * percent, 2, Color(255, 255, 255, 225));
+            render::warning.string(position.x, position.y - render::warning.size(icon).m_height / 2.f, { 255,255,255,255 }, icon, render::ALIGN_CENTER);
+        }
+
     }
     return true;
 }
