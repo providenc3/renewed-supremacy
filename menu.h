@@ -1111,16 +1111,16 @@ public:
 		proj_col_slider.AddShowCallback(callbacks::grenadeson);
 		RegisterElement(&proj_col_slider);
 
-		grenade_path.setup(XOR("grenade path"), XOR("grenade_path"));
+		grenade_path.setup(XOR("grenade warning"), XOR("grenade_path"));
 		grenade_path.AddShowCallback(callbacks::grenadeson);
 		RegisterElement(&grenade_path);
 
-		grenade_path_col.setup(XOR("grenade path color"), XOR("grenade_path_col"), { 151, 130, 255 });
+		grenade_path_col.setup(XOR("grenade warning color"), XOR("grenade_path_col"), { 151, 130, 255 });
 		grenade_path_col.AddShowCallback(callbacks::grenadeson);
 		RegisterElement(&grenade_path_col);
 
-		grenade_warning.setup(XOR("grenade proximity warning"), XOR("warning_prox"));
-		RegisterElement(&grenade_warning, 1);
+		//grenade_warning.setup(XOR("grenade proximity warning"), XOR("warning_prox"));
+		//RegisterElement(&grenade_warning, 1);
 
 		force_xhair.setup(XOR("crosshair"), XOR("force_xhair"));
 		RegisterElement(&force_xhair);

@@ -52,7 +52,7 @@ void Client::ClanTag()
 		{
 			if (is_freeze_period)
 			{
-				SetClanTag("vixhook");
+				SetClanTag("madikhook");
 			}
 			is_freeze_period = false;
 			return;
