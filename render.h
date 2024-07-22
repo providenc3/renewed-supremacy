@@ -78,6 +78,7 @@ namespace render {
 	void line( int x0, int y0, int x1, int y1, Color color );
 	void rect( int x, int y, int w, int h, Color color );
 	void rect_filled( int x, int y, int w, int h, Color color );
+	void world_circle(vec3_t origin, float radius, Color color);
 	void RectFilled(vec2_t pos, vec2_t size, Color color);
 	void rect_filled_fade( int x, int y, int w, int h, Color color, int a1, int a2 );
 	void rect_outlined( int x, int y, int w, int h, Color color, Color color2 );

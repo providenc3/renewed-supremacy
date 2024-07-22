@@ -82,6 +82,61 @@ auto clean_item_name = [](const char* name) -> const char*
 		return name;
 	};
 
+// meme...
+void Visuals::IndicateAngles()
+{
+	if (!g_cl.m_local)
+		return;
+
+	if (!g_menu.main.antiaim.draw_angles.get())
+		return;
+
+	if (!g_csgo.m_input->CAM_IsThirdPerson())
+		return;
+
+	if (!g_cl.m_local || g_cl.m_local->m_iHealth() < 1)
+		return;
+
+	const auto& pos = g_cl.m_local->GetRenderOrigin();
+	vec2_t tmp;
+
+	if (render::WorldToScreen(pos, tmp))
+	{
+		vec2_t draw_tmp;
+		const vec3_t real_pos(50.f * std::cos(math::deg_to_rad(g_cl.m_radar.y)) + pos.x, 50.f * sin(math::deg_to_rad(g_cl.m_radar.y)) + pos.y, pos.z);
+
+		if (render::WorldToScreen(real_pos, draw_tmp))
+		{
+			render::line(tmp.x, tmp.y, draw_tmp.x, draw_tmp.y, { 0, 255, 0, 255 });
+			render::esp_small.string(draw_tmp.x, draw_tmp.y, { 255, 0, 0, 255 }, "FAKE", render::ALIGN_LEFT);
+		}
+
+		if (g_menu.main.antiaim.fake_yaw.get())
+		{
+			const vec3_t fake_pos(50.f * cos(math::deg_to_rad(g_cl.m_angle.y)) + pos.x, 50.f * sin(math::deg_to_rad(g_cl.m_angle.y)) + pos.y, pos.z);
+
+			if (render::WorldToScreen(fake_pos, draw_tmp))
+			{
+				render::line(tmp.x, tmp.y, draw_tmp.x, draw_tmp.y, { 255, 0, 0, 255 });
+				render::esp_small.string(draw_tmp.x, draw_tmp.y, { 0, 255, 0, 255 }, "REAL", render::ALIGN_LEFT);
+			}
+		}
+
+		if (g_menu.main.antiaim.body_yaw_fake.get() == 1 || g_menu.main.antiaim.body_yaw_fake.get() == 2 || g_menu.main.antiaim.body_yaw_fake.get() == 3 || g_menu.main.antiaim.body_yaw_fake.get() == 4 || g_menu.main.antiaim.body_yaw_fake.get() == 5 || g_menu.main.antiaim.body_yaw_fake.get() == 6)
+		{
+			float lby = g_cl.m_local->m_flLowerBodyYawTarget();
+			const vec3_t lby_pos(50.f * cos(math::deg_to_rad(lby)) + pos.x,
+				50.f * sin(math::deg_to_rad(lby)) + pos.y, pos.z);
+
+			if (render::WorldToScreen(lby_pos, draw_tmp))
+			{
+				render::line(tmp.x, tmp.y, draw_tmp.x, draw_tmp.y, { 255, 255, 255, 255 });
+				render::esp_small.string(draw_tmp.x, draw_tmp.y, { 255, 255, 255, 255 }, "LBY", render::ALIGN_LEFT);
+			}
+		}
+	}
+}
+
 void Visuals::ThirdpersonThink()
 {
 	ang_t                          offset;
@@ -399,6 +454,7 @@ void Visuals::think() {
 	hitmarker_world();
 	DrawPlantedC4();
 	AutopeekIndicator();
+	IndicateAngles();
 }
 
 void Visuals::Spectators() {
@@ -802,30 +858,68 @@ std::string to_string_with_precision(const T a_value, const int n = 3)
 	return out.str();
 }
 
+const char* kurwaikonynade(int index)
+{
+	switch (index)
+	{
+	case SMOKE: return "k"; break;
+	case MOLOTOV:return "l"; break;
+	case HEGRENADE: return "j"; break;
+	case FLASHBANG: return "i"; break;
+	case DECOY: return "m"; break;
+	case C4: return "o"; break;
+	}
+}
+
 void Visuals::DrawProjectile(Weapon* ent) {
 	vec2_t screen;
 	vec3_t origin = ent->GetAbsOrigin();
+
+
+
 	if (!render::WorldToScreen(origin, screen))
 		return;
 
 	Color col = g_menu.main.visuals.proj_color.get();
-	auto moly_color = Color(255, 0, 0);
-	auto smoke_color = Color(58, 214, 252);
 	col.a() = 0xb4;
 
-	auto dist_world = g_cl.m_local->m_vecOrigin().dist_to(origin);
-	if (dist_world > 150.f) {
-		col.a() *= std::clamp((750.f - (dist_world - 200.f)) / 750.f, 0.f, 1.f);
+	if (ent->is(HASH("CHostage"))) {
+		std::string distance;
+		int dist = (((ent->m_vecOrigin() - g_cl.m_local->m_vecOrigin()).length_sqr()) * 0.0625) * 0.001;
+		//if (dist > 0)
+		//distance = tfm::format(XOR("%i FT"), dist);
+		if (dist > 0) {
+			if (dist > 5) {
+				while (!(dist % 5 == 0)) {
+					dist = dist - 1;
+				}
+
+				if (dist % 5 == 0)
+					distance = tfm::format(XOR("%i FT"), dist);
+			}
+			else
+				distance = tfm::format(XOR("%i FT"), dist);
+		}
+		if (dist < 150) {
+			render::esp_small.string(screen.x, screen.y, colors::light_blue, XOR("HOSTAGE"), render::ALIGN_CENTER);
+			render::esp_small.string(screen.x, screen.y - 7, colors::light_blue, distance, render::ALIGN_CENTER);
+		}
 	}
 
-
 	// draw decoy.
-	if (ent->is(HASH("CDecoyProjectile")))
-		render::menu.string(screen.x, screen.y, col, XOR("decoy"), render::ALIGN_CENTER);
+	if (ent->is(HASH("CDecoyProjectile"))) {
+		render::esp_small.string(screen.x, screen.y, col, XOR("DECOY"), render::ALIGN_CENTER);
+		std::string ikonakurwa4 = tfm::format(XOR("%c"), kurwaikonynade(DECOY));
+		render::warning.string(screen.x, screen.y - 25, Color(255, 255, 255), ikonakurwa4, render::ALIGN_CENTER);
+	}
 
 	// draw molotov.
-	else if (ent->is(HASH("CMolotovProjectile")))
-		render::menu.string(screen.x, screen.y, col, XOR("molotov"), render::ALIGN_CENTER);
+	else if (ent->is(HASH("CMolotovProjectile"))) {
+		render::esp_small.string(screen.x, screen.y, col, XOR("MOLLY"), render::ALIGN_CENTER);
+		std::string ikonakurwa1 = tfm::format(XOR("%c"), kurwaikonynade(MOLOTOV));
+		render::warning.string(screen.x, screen.y - 25, Color(255, 255, 255), ikonakurwa1, render::ALIGN_CENTER);
+		//render::sphere(origin, 100.f, 5.f, 1.f, g_menu.main.visuals.proj_color.get());
+	}
 
 	else if (ent->is(HASH("CBaseCSGrenadeProjectile"))) {
 		const model_t* model = ent->GetModel();
@@ -834,57 +928,89 @@ void Visuals::DrawProjectile(Weapon* ent) {
 			// grab modelname.
 			std::string name{ ent->GetModel()->m_name };
 
-			if (name.find(XOR("flashbang")) != std::string::npos)
-				render::menu.string(screen.x, screen.y, col, XOR("flashbang"), render::ALIGN_CENTER);
+			if (name.find(XOR("flashbang")) != std::string::npos) {
+				render::esp_small.string(screen.x, screen.y, col, XOR("FLASH"), render::ALIGN_CENTER);
+				std::string ikonakurwa5 = tfm::format(XOR("%c"), kurwaikonynade(FLASHBANG));
+				render::warning.string(screen.x, screen.y - 25, Color(255, 255, 255), ikonakurwa5, render::ALIGN_CENTER);
+			}
 
 			else if (name.find(XOR("fraggrenade")) != std::string::npos) {
 
 				// grenade range.
-					//render::sphere( origin, 350.f, 5.f, 1.f, g_menu.main.visuals.proj_range_color.get( ) );
 
-				render::menu.string(screen.x, screen.y, col, XOR("he grenade"), render::ALIGN_CENTER);
+				//render::sphere(origin, 100.f, 5.f, 1.f, g_menu.main.visuals.proj_color.get());
+				render::esp_small.string(screen.x, screen.y, col, XOR("FRAG"), render::ALIGN_CENTER);
+				std::string ikonakurwa3 = tfm::format(XOR("%c"), kurwaikonynade(HEGRENADE));
+				render::warning.string(screen.x, screen.y - 25, Color(255, 255, 255), ikonakurwa3, render::ALIGN_CENTER);
 			}
 		}
 	}
+
 	// find classes.
 	else if (ent->is(HASH("CInferno"))) {
+		// molotov range.
+		if (g_menu.main.visuals.proj_range.get()) {
+			// setup our vectors.
+			vec3_t mins, maxs;
+
+			// get molotov bounds (current radius).
+			ent->GetRenderBounds(mins, maxs);
+
+			// render the molotov range circle.
+			render::world_circle(origin, vec3_t(maxs - mins).length_2d() * 0.5, colors::red);
+		}
 
 		const double spawn_time = *(float*)(uintptr_t(ent) + 0x20);
 		const double factor = ((spawn_time + 7.031) - g_csgo.m_globals->m_curtime) / 7.031;
-		Color col_timer = g_menu.main.visuals.proj_range_color.get();
-		if (spawn_time > 0.f && g_menu.main.visuals.proj.get()) {
-			// render our bg then timer colored bar
-			float radius = 144.f;
-			render::round_rect(screen.x - 13 + 1, screen.y + 9, 26, 4, 2, Color(0, 0, 0, col.a()));
-			render::round_rect(screen.x - 13 + 2, screen.y + 9 + 1, 24 * factor, 2, 2, Color(col_timer.r(), col_timer.g(), col_timer.b(), col.a()));
 
-			// render the circle
-			render::WorldCircleOutline(origin, radius, 1.f, moly_color);
+		if (g_menu.main.visuals.proj.get()) {
+			render::rect_filled(screen.x - 13 + 1, screen.y + 10, 26, 4, { 16, 16, 16, 170 });
+			render::rect_filled(screen.x - 13 + 2, screen.y + 10 + 1, 24 * factor, 2, { 255, 255, 255, 250 });
 
-
-			// render our timer in seconds and our title text
-			render::menu.string(screen.x - 13 + 26 * factor, screen.y + 7, col, tfm::format(XOR("%.1f"), (spawn_time + 7.031) - g_csgo.m_globals->m_curtime), render::ALIGN_CENTER);
-			render::menu.string(screen.x, screen.y, col, XOR("molotov"), render::ALIGN_CENTER);
+			if (g_menu.main.visuals.proj.get())
+				render::esp_small.string(screen.x - 13 + 26 * factor, screen.y + 8, { 255, 255, 255, 180 }, tfm::format(XOR("%.1f"), (spawn_time + 7.031) - g_csgo.m_globals->m_curtime), render::ALIGN_CENTER);
 		}
+
+		render::esp_small.string(screen.x, screen.y, col, XOR("FIRE"), render::ALIGN_CENTER);
+		std::string ikonakurwa1 = tfm::format(XOR("%c"), kurwaikonynade(MOLOTOV));
+		render::warning.string(screen.x, screen.y - 25, Color(255, 255, 255), ikonakurwa1, render::ALIGN_CENTER);
 	}
 
 	else if (ent->is(HASH("CSmokeGrenadeProjectile"))) {
-		float radius = 144.f;
+		// get smoke info.
 		const float spawn_time = game::TICKS_TO_TIME(ent->m_nSmokeEffectTickBegin());
 		const double factor = ((spawn_time + 18.041) - g_csgo.m_globals->m_curtime) / 18.041;
-		Color col_timer = g_menu.main.visuals.proj_range_color.get();
-		if (spawn_time > 0.f && g_menu.main.visuals.proj_range.get()) {
-			// render our bg then timer colored bar
-			render::round_rect(screen.x - 13 + 1, screen.y + 9, 26, 4, 2, Color(0, 0, 0, col.a()));
-			render::round_rect(screen.x - 13 + 2, screen.y + 9 + 1, 24 * factor, 2, 2, Color(col_timer.r(), col_timer.g(), col_timer.b(), col.a()));
 
-			// render the circle
-			render::WorldCircleOutline(origin, radius, 1.f, smoke_color);
+		// make sure the smoke effect has started
+		if (spawn_time > 0.f) {
+			// smoke range.
+			if (g_menu.main.visuals.proj_range.get()) {
+				float radius = 144.f;
+				auto time_since_explosion = g_csgo.m_globals->m_interval * (g_csgo.m_globals->m_tick_count - ent->m_nSmokeEffectTickBegin());
 
-			// render our timer in seconds and our title text
-			render::menu.string(screen.x - 13 + 26 * factor, screen.y + 7, col, tfm::format(XOR("%.1f"), (spawn_time + 18.04125) - g_csgo.m_globals->m_curtime), render::ALIGN_CENTER);
-			render::menu.string(screen.x, screen.y, col, XOR("smoke"), render::ALIGN_CENTER);
+				// sexy animation.
+				if (0.3f > time_since_explosion)
+					radius = radius * 0.6f + (radius * (time_since_explosion / 0.3f)) * 0.4f;
+
+				if (1.0f > (18.041 - time_since_explosion))
+					radius = radius * (((18.041 - time_since_explosion) / 1.0f) * 0.3f + 0.7f);
+
+				// render the smoke range circle.
+				render::world_circle(origin, radius, colors::light_blue);
+			}
+
+			if (g_menu.main.visuals.proj.get()) {
+				render::rect_filled(screen.x - 13 + 1, screen.y + 10, 26, 4, { 16, 16, 16, 170 });
+				render::rect_filled(screen.x - 13 + 2, screen.y + 10 + 1, 24 * factor, 2, { 255, 255, 255, 250 });
+
+				if (g_menu.main.visuals.proj.get())
+					render::esp_small.string(screen.x - 13 + 26 * factor, screen.y + 8, { 255, 255, 255, 180 }, tfm::format(XOR("%.1f"), (spawn_time + 18.04125) - g_csgo.m_globals->m_curtime), render::ALIGN_CENTER);
+			}
 		}
+
+		render::esp_small.string(screen.x, screen.y, col, XOR("SMOKE"), render::ALIGN_CENTER);
+		std::string ikonakurwa2 = tfm::format(XOR("%c"), kurwaikonynade(SMOKE));
+		render::warning.string(screen.x, screen.y - 25, Color(255, 255, 255), ikonakurwa2, render::ALIGN_CENTER);
 	}
 }
 
@@ -964,7 +1090,7 @@ void Visuals::DrawItem(Weapon* item) {
 	}
 
 	// render bomb in green.
-	if (g_menu.main.visuals.planted_c4.get() && item->is(HASH("CC4")))
+	//if (g_menu.main.visuals.planted_c4.get() && item->is(HASH("CC4")))
 		render::menu.string(screen.x, screen.y, Color(col2.r(), col2.g(), col2.b(), alpha2), XOR("BOMB"), render::ALIGN_CENTER);
 
 	if (item->is(HASH("CC4")))
@@ -1760,7 +1886,8 @@ return;
 }
 }
 
-void Visuals::DrawPlantedC4() {
+void Visuals::DrawPlantedC4()
+{
 	bool        mode_2d, mode_3d, is_visible;
 	float       explode_time_diff, dist, range_damage;
 	vec3_t      dst, to_target;
@@ -1769,27 +1896,30 @@ void Visuals::DrawPlantedC4() {
 	Color       damage_color;
 	vec2_t      screen_pos;
 
-	static auto scale_damage = [](float damage, int armor_value) {
-		float new_damage, armor;
+	static auto scale_damage = [](float damage, int armor_value)
+		{
+			float new_damage, armor;
 
-		if (armor_value > 0) {
-			new_damage = damage * 0.5f;
-			armor = (damage - new_damage) * 0.5f;
+			if (armor_value > 0)
+			{
+				new_damage = damage * 0.5f;
+				armor = (damage - new_damage) * 0.5f;
 
-			if (armor > (float)armor_value) {
-				armor = (float)armor_value * 2.f;
-				new_damage = damage - armor;
+				if (armor > (float)armor_value)
+				{
+					armor = (float)armor_value * 2.f;
+					new_damage = damage - armor;
+				}
+
+				damage = new_damage;
 			}
 
-			damage = new_damage;
-		}
-
-		return std::max(0, (int)std::floor(damage));
+			return std::max(0, (int)std::floor(damage));
 		};
 
 	// store menu vars for later.
-	mode_2d = g_menu.main.visuals.planted_c4.get();
-	mode_3d = g_menu.main.visuals.planted_c4.get();
+	mode_2d = g_menu.main.visuals.planted_c4.get(0);
+	mode_3d = g_menu.main.visuals.planted_c4.get(1);
 	if (!mode_2d && !mode_3d)
 		return;
 
@@ -1797,6 +1927,11 @@ void Visuals::DrawPlantedC4() {
 	if (!m_c4_planted)
 		return;
 
+	// calculate bomb damage.
+	// references:
+	//     https://github.com/VSES/SourceEngine2007/blob/43a5c90a5ada1e69ca044595383be67f40b33c61/se2007/game/shared/cstrike/weapon_c4.cpp#L271
+	//     https://github.com/VSES/SourceEngine2007/blob/43a5c90a5ada1e69ca044595383be67f40b33c61/se2007/game/shared/cstrike/weapon_c4.cpp#L437
+	//     https://github.com/ValveSoftware/source-sdk-2013/blob/master/sp/src/game/shared/sdk/sdk_gamerules.cpp#L173
 	{
 		// get our distance to the bomb.
 		// todo - dex; is dst right? might need to reverse CBasePlayer::BodyTarget...
@@ -1824,14 +1959,48 @@ void Visuals::DrawPlantedC4() {
 	// finally do all of our rendering.
 	is_visible = render::WorldToScreen(m_planted_c4_explosion_origin, screen_pos);
 
+	std::string bomb = m_last_bombsite.c_str();
+
 	// 'on screen (2D)'.
-	if (mode_2d) {
+	if (mode_2d)
+	{
+		std::string timer1337 = tfm::format(XOR("%s - %.1fs"), bomb.substr(0, 1), explode_time_diff);
+		std::string damage1337 = tfm::format(XOR("%i"), final_damage);
 
+		Color colortimer = { 135, 172, 10, 255 };
+		if (explode_time_diff < 10) colortimer = { 200, 200, 110, 255 };
+		if (explode_time_diff < 5) colortimer = { 192, 32, 17, 255 };
+
+		if (m_c4_planted && !bombexploded && !bombedefused)
+		{
+			if (explode_time_diff > 0.f)
+			{
+				render::indicator.string(6, 11, { 0,0, 0, 125 }, timer1337);
+				render::indicator.string(5, 10, colortimer, timer1337);
+			}
+			//Render.StringCustom(5, 0, 0, getSite(c4) + timer + "s", colortimer, font);
+			if (g_cl.m_local->m_iHealth() <= final_damage)
+			{
+				render::indicator.string(6, 31, { 0,0, 0, 125 }, tfm::format(XOR("FATAL")));
+				render::indicator.string(5, 30, { 192, 32, 17, 255 }, tfm::format(XOR("FATAL")));
+			}
+			else if (final_damage > 1)
+			{
+				render::indicator.string(5, 31, { 0,0, 0, 125 }, tfm::format(XOR("- %iHP"), damage1337));
+				render::indicator.string(6, 30, { 255, 255, 255, 255 }, tfm::format(XOR("- %iHP"), damage1337));
+			}
+		}
+	}
+
+	// 'on bomb (3D)'.
+	if (mode_3d && is_visible)
+	{
 		if (explode_time_diff > 0.f)
-			render::esp2.string(2, 65, colors::white, time_str, render::ALIGN_LEFT);
+			render::esp_small.string(screen_pos.x, screen_pos.y, colors::white, time_str, render::ALIGN_CENTER);
 
+		// only render damage string if we're alive.
 		if (g_cl.m_local->alive())
-			render::esp2.string(2, 65 + render::esp.m_size.m_height, damage_color, damage_str, render::ALIGN_LEFT);
+			render::esp_small.string(screen_pos.x, (int)screen_pos.y + render::esp_small.m_size.m_height, damage_color, damage_str, render::ALIGN_CENTER);
 	}
 }
 
@@ -2080,7 +2249,7 @@ void Visuals::RenderGlow() {
 			obj->m_bloom_amount = 1.f;
 		}
 
-		if (isc4(classid) && g_menu.main.visuals.planted_c4.get()) {
+		//if (isc4(classid) && g_menu.main.visuals.planted_c4.get()) {
 			color = g_menu.main.visuals.bomb_col.get();
 
 			float blend = g_menu.main.visuals.bomb_col_glow_slider.get() / 100.f;
@@ -2091,7 +2260,7 @@ void Visuals::RenderGlow() {
 			obj->m_color = { (float)color.r() / 255.f, (float)color.g() / 255.f, (float)color.b() / 255.f };
 			obj->m_alpha = blend;
 			obj->m_bloom_amount = 1.f;
-		}
+		//}
 
 		if (obj->m_entity->IsBaseCombatWeapon() && g_menu.main.visuals.itemsglow.get()) {
 			color = g_menu.main.visuals.item_color.get();

@@ -430,147 +430,67 @@ void Movement::FixMove( CUserCmd *cmd, const ang_t &wish_angles ) {
 		cmd->m_buttons &= ~(IN_FORWARD | IN_BACK | IN_MOVERIGHT | IN_MOVELEFT);
 }
 
-void Movement::AutoPeek(CUserCmd* cmd, float wish_yaw) {
+void Movement::quickpeekassist(CUserCmd* cmd, float wish_yaw) {
 	if (g_input.GetKeyState(g_menu.main.aimbot.quickpeekassist.get())) {
-		if (start_position.IsZero()) {
-			start_position = g_cl.m_local->GetAbsOrigin();
+			if (start_position.IsZero()) {
+				start_position = g_cl.m_local->GetAbsOrigin();
 
-			if (!(g_cl.m_flags & FL_ONGROUND)) {
-				CTraceFilterWorldOnly filter;
-				CGameTrace trace;
+				if (!(g_cl.m_flags & FL_ONGROUND)) {
+					CTraceFilterWorldOnly filter;
+					CGameTrace trace;
 
+					g_csgo.m_engine_trace->TraceRay(Ray(start_position, start_position - vec3_t(0.0f, 0.0f, 1000.0f)), MASK_SOLID, &filter, &trace);
 
+					if (trace.m_fraction < 1.0f)
+						start_position = trace.m_endpos + vec3_t(0.0f, 0.0f, 2.0f);
+				}
+			}
+			else {
+				bool revolver_shoot = g_cl.m_weapon_id == REVOLVER && !g_cl.m_revolver_fire && (cmd->m_buttons & IN_ATTACK || cmd->m_buttons & IN_ATTACK2);
 
-				g_csgo.m_engine_trace->TraceRay(Ray(start_position, start_position - vec3_t(0.0f, 0.0f, 1000.0f)), MASK_SOLID, &filter, &trace);
+				if (g_cl.m_old_shot)
+					fired_shot = true;
 
-				if (trace.m_fraction < 1.0f)
-					start_position = trace.m_endpos + vec3_t(0.0f, 0.0f, 2.0f);
+				if (fired_shot) {
+					vec3_t current_position = g_cl.m_local->GetAbsOrigin();
+					vec3_t difference = current_position - start_position;
+
+					if (difference.length_2d() > 5.0f) {
+						vec3_t velocity = vec3_t(difference.x * cos(wish_yaw / 180.0f * math::pi) + difference.y * sin(wish_yaw / 180.0f * math::pi), difference.y * cos(wish_yaw / 180.0f * math::pi) - difference.x * sin(wish_yaw / 180.0f * math::pi), difference.z);
+
+						if (difference.length_2d() < 50.0f) {
+							cmd->m_forward_move = -velocity.x * 20.0f;
+							cmd->m_side_move = velocity.y * 20.0f;
+						}
+						else if (difference.length_2d() < 100.0f) {
+							cmd->m_forward_move = -velocity.x * 10.0f;
+							cmd->m_side_move = velocity.y * 10.0f;
+						}
+						else if (difference.length_2d() < 150.0f) {
+							cmd->m_forward_move = -velocity.x * 5.0f;
+							cmd->m_side_move = velocity.y * 5.0f;
+						}
+						else if (difference.length_2d() < 250.0f) {
+							cmd->m_forward_move = -velocity.x * 2.0f;
+							cmd->m_side_move = velocity.y * 2.0f;
+						}
+						else {
+							cmd->m_forward_move = -velocity.x * 1.0f;
+							cmd->m_side_move = velocity.y * 1.0f;
+						}
+					}
+					else {
+						fired_shot = false;
+						start_position.clear();
+					}
+				}
 			}
 		}
 		else {
-			bool revolver_shoot = g_cl.m_weapon_id == REVOLVER && !g_cl.m_revolver_fire && (cmd->m_buttons & IN_ATTACK || cmd->m_buttons & IN_ATTACK2);
-
-			if (g_cl.m_old_shot)
-				fired_shot = true;
-
-			if (fired_shot) {
-				vec3_t current_position = g_cl.m_local->GetAbsOrigin();
-				vec3_t difference = current_position - start_position;
-
-				if (difference.length_2d() > 5.0f) {
-					vec3_t velocity = vec3_t(difference.x * cos(wish_yaw / 180.0f * math::pi) + difference.y * sin(wish_yaw / 180.0f * math::pi), difference.y * cos(wish_yaw / 180.0f * math::pi) - difference.x * sin(wish_yaw / 180.0f * math::pi), difference.z);
-
-					if (difference.length_2d() < 50.0f) {
-						cmd->m_forward_move = -velocity.x * 20.0f;
-						cmd->m_side_move = velocity.y * 20.0f;
-					}
-					else if (difference.length_2d() < 100.0f) {
-						cmd->m_forward_move = -velocity.x * 10.0f;
-						cmd->m_side_move = velocity.y * 10.0f;
-					}
-					else if (difference.length_2d() < 150.0f) {
-						cmd->m_forward_move = -velocity.x * 5.0f;
-						cmd->m_side_move = velocity.y * 5.0f;
-					}
-					else if (difference.length_2d() < 250.0f) {
-						cmd->m_forward_move = -velocity.x * 2.0f;
-						cmd->m_side_move = velocity.y * 2.0f;
-					}
-					else {
-						cmd->m_forward_move = -velocity.x * 1.0f;
-						cmd->m_side_move = velocity.y * 1.0f;
-					}
-				}
-				else {
-					fired_shot = false;
-					start_position.clear();
-				}
-			}
+			fired_shot = false;
+			start_position.clear();
 		}
 	}
-	else {
-		fired_shot = false;
-		start_position.clear();
-	}
-
-	bool can_stop = g_menu.main.aimbot.quick_stop.get() || (!g_menu.main.aimbot.quick_stop.get() && g_input.GetKeyState(g_menu.main.aimbot.quick_stop.get()));
-	if ((g_input.GetKeyState(g_menu.main.aimbot.quick_stop.get()) || can_stop) && g_aimbot.m_stop) {
-		Movement::QuickStop();
-	}
-
-}
-
-
-void Movement::QuickStop() {
-	if (!g_cl.m_cmd || !g_cl.m_local || !g_cl.m_local->alive())
-		return;
-
-	// don't fake movement while noclipping or on ladders..
-	if (!g_cl.m_weapon || g_cl.m_local->m_MoveType() == MOVETYPE_NOCLIP || g_cl.m_local->m_MoveType() == MOVETYPE_LADDER)
-		return;
-
-	if (!(g_cl.m_local->m_fFlags() & FL_ONGROUND))
-		return;
-
-	if (g_cl.m_cmd->m_buttons & IN_JUMP || !g_aimbot.m_stop)
-		return;
-
-	if (!g_cl.m_weapon_info)
-		return;
-
-	// convert velocity to angular momentum.
-	ang_t angle;
-	math::VectorAngles(g_cl.m_local->m_vecVelocity(), angle);
-
-	// get our current speed of travel.
-	vec3_t vel = g_cl.m_local->m_vecVelocity();
-	float speed = vel.length();
-
-	// fix direction by factoring in where we are looking.
-	angle.y = g_cl.m_view_angles.y - angle.y;
-
-	// convert corrected angle back to a direction.
-	vec3_t direction;
-	math::AngleVectors(angle, &direction);
-
-	vec3_t stop = direction * -speed;
-
-	if (g_cl.m_speed < 0.1f)
-	{
-		g_cl.m_cmd->m_forward_move = 0.f;
-		g_cl.m_cmd->m_side_move = 0.f;
-		return;
-	}
-
-	static auto sv_accelerate = g_csgo.m_cvar->FindVar(HASH("sv_accelerate"));
-	float accel = sv_accelerate->GetFloat();
-	float max_speed = g_cl.m_local->GetActiveWeapon()->GetWpnData()->m_max_player_speed;
-
-	if (g_cl.m_local->m_bIsScoped()) {
-		max_speed = g_cl.m_local->GetActiveWeapon()->GetWpnData()->m_max_player_speed_alt;
-	}
-
-	max_speed = std::min< float >(max_speed, 250.f);
-
-	float surf_friction = 1.f;
-	float max_accelspeed = accel * g_csgo.m_globals->m_interval * max_speed * surf_friction;
-
-	float wishspeed{ };
-
-	if (speed - max_accelspeed <= -1.f) {
-		wishspeed = max_accelspeed / (speed / (accel * g_csgo.m_globals->m_interval));
-	}
-	else {
-		wishspeed = max_accelspeed;
-	}
-
-	vec3_t ndir = math::vector_angles(vel * -1.f);
-	ndir.y = g_cl.m_cmd->m_view_angles.y - ndir.y;
-	ndir = math::angle_vectors(ndir);
-
-	g_cl.m_cmd->m_forward_move = ndir.x * wishspeed;
-	g_cl.m_cmd->m_side_move = ndir.y * wishspeed;
-}
 
 
 

@@ -65,7 +65,7 @@ bool callbacks::grenadeson() {
 }
 
 bool callbacks::bombon() {
-	return g_menu.main.visuals.planted_c4.get();
+	return g_menu.main.visuals.proj.get();
 }
 
 bool callbacks::boxon() {

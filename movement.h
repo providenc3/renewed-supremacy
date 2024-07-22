@@ -33,8 +33,7 @@ public:
 	void full_walk_move(const CUserCmd cmd, vec3_t move, vec3_t fwd, vec3_t right, vec3_t velocity);
 	void modify_move(CUserCmd cmd, vec3_t velocity);
 	void predict_move(const CUserCmd cmd, vec3_t velocity);
-	void AutoPeek(CUserCmd* cmd, float wish_yaw);
-	void QuickStop();
+	void quickpeekassist(CUserCmd* cmd, float wish_yaw);
 	void FakeWalk( );
 	void FastStop();
 	void ClampMovementSpeed(float speed);

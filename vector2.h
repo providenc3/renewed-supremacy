@@ -48,6 +48,10 @@ public:
 		return *this;
 	}
 
+	_forceinline bool valid() const {
+		return x > 1 && y > 1;
+	}
+
 	// negation-operator.
 	__forceinline vec2_t operator-( ) const {
 		return vec2_t( -x, -y );

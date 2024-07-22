@@ -37,6 +37,25 @@ void render::init() {
 	warning = Font(XOR("undefeated"), 22, FW_SEMIBOLD, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
 }
 
+void render::world_circle(vec3_t origin, float radius, Color color) {
+	vec2_t previous_screen_pos, screen_pos;
+
+	g_csgo.m_surface->DrawSetColor(color);
+	float step = M_PI * 2.0f / 72.0f;
+
+	for (float rotation = 0; rotation < (M_PI * 2.0f); rotation += step) {
+		vec3_t pos(radius * cos(rotation) + origin.x, radius * sin(rotation) + origin.y, origin.z);
+
+		if (render::WorldToScreen(pos, screen_pos)) {
+			if (previous_screen_pos.valid() && screen_pos.valid() && previous_screen_pos != screen_pos) {
+				g_csgo.m_surface->DrawLine(previous_screen_pos.x, previous_screen_pos.y, screen_pos.x, screen_pos.y);
+			}
+
+			previous_screen_pos = screen_pos;
+		}
+	}
+}
+
 void render::circle3d(vec3_t pos, Color color, int point_count, float radius, bool fade, float rot_start, float fade_start, float fade_length)
 {
 	float step = math::pi * 2.0f / point_count;

@@ -423,7 +423,7 @@ void Client::DoMove() {
 	g_movement.Strafe();
 	g_movement.FakeWalk();
 	g_movement.AutoStop();
-	g_movement.AutoPeek(g_cl.m_cmd, m_strafe_angles.y);
+	g_movement.quickpeekassist(g_cl.m_cmd, m_strafe_angles.y);
 	g_movement.FastStop();
 
 	g_aimbot.m_stop_air = false;

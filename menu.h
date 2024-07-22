@@ -275,6 +275,7 @@ public:
 	Keybind		  manual_right;
 	Keybind		  manual_back;
 	Keybind		  manual_front;
+	Checkbox draw_angles;
 	Dropdown      slide_type;
 
 public:
@@ -527,6 +528,9 @@ public:
 		landangle.setup(XOR("animation angle"), XOR("landangle"), -89, 89, false, 0, -12, 1.f);
 		landangle.AddShowCallback(callbacks::landon);
 		RegisterElement(&landangle, 1);
+
+		draw_angles.setup(XOR("draw angles"), XOR("draw_angles"));
+		RegisterElement(&draw_angles, 1);
 
 		manualaa.setup(XOR("enable manual anti-aim"), XOR("manualaa"));
 		RegisterElement(&manualaa, 1);
@@ -999,7 +1003,7 @@ public:
 	Checkbox      grenade_path;
 	Colorpicker grenade_path_col;
 	Checkbox grenade_warning;
-	Checkbox planted_c4;
+	MultiDropdown planted_c4;
 	Colorpicker         bomb_col;
 	Slider        bomb_col_slider;
 	Slider        bomb_col_glow_slider;
@@ -1125,7 +1129,7 @@ public:
 		force_xhair.setup(XOR("crosshair"), XOR("force_xhair"));
 		RegisterElement(&force_xhair);
 
-		planted_c4.setup(XOR("bomb"), XOR("planted_c4"));
+		planted_c4.setup(XOR("planted c4"), XOR("planted_c4"), { XOR("on screen (2D)"), XOR("on bomb (3D)"), XOR("bomb timer (2D)"), XOR("bomb rimer (3D)") });
 		RegisterElement(&planted_c4);
 
 		bomb_col.setup(XOR("bomb color"), XOR("bomb_col"), { 151, 200, 60 });

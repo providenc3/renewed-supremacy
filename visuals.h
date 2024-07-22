@@ -50,6 +50,9 @@ public:
 
     // info about planted c4.
     bool        m_c4_planted;
+	bool                                    planted;
+	bool                                    bombexploded;
+	bool                                    bombedefused;
     Entity* m_planted_c4;
     float       m_planted_c4_explode_time;
     vec3_t      m_planted_c4_explosion_origin;
@@ -168,6 +171,7 @@ public:
 	void draw( Entity* ent );
 	void DrawProjectile( Weapon* ent );
 	void AutopeekIndicator();
+	void IndicateAngles();
 	void DrawItem( Weapon* item );
 	void OffScreen( Player* player, int alpha );
     std::string GetWeaponIcon(const int id);

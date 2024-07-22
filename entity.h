@@ -1453,6 +1453,11 @@ public:
 	}
 
 public:
+
+	__forceinline void GetRenderBounds(vec3_t& mins, vec3_t& maxs) {
+		return util::get_method< void(__thiscall*)(void*, vec3_t&, vec3_t&) >(renderable(), 17)(renderable(), mins, maxs);
+	}
+
 	// netvars / etc.
 	__forceinline vec3_t& m_vecOrigin() {
 		return get< vec3_t >(g_entoffsets.m_vecOrigin);
