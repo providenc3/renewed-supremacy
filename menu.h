@@ -277,6 +277,7 @@ public:
 	Keybind		  manual_front;
 	Checkbox draw_angles;
 	Dropdown      slide_type;
+	MultiDropdown distortion_triggers;
 
 public:
 	void init() {
@@ -297,13 +298,16 @@ public:
 		distortion.setup(XOR("distortion"), XOR("distortion"));
 		RegisterElement(&distortion);
 
-		force_turn.setup(XOR("force turn"), XOR("force_turn"));
-		RegisterElement(&force_turn);
+		//distortion_triggers.setup("distortion triggers", XOR("distortion_triggers"), {  XOR("on stand"), XOR("on move"),XOR("on air") });
+		//RegisterElement(&distortion_triggers);
+
+		//force_turn.setup(XOR("force turn"), XOR("force_turn"));
+		//RegisterElement(&force_turn);
 
 		distortion_speed.setup("speed", XOR("distortion_speed"), 1.f, 100.f, false, 0, 10.f, 1.f, XOR(L"%"));
 		RegisterElement(&distortion_speed);
 
-		distortion_range.setup("range", XOR("distortion_range "), 1.f, 360.f, false, 0, 10.f, 1.f, XOR(L"*"));
+		distortion_range.setup("range", XOR("distortion_range "), -360.f, 360.f, false, 0, 10.f, 1.f, XOR(L"°"));
 		RegisterElement(&distortion_range);
 
 		// stand.

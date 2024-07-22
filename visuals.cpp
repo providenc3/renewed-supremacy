@@ -107,7 +107,7 @@ void Visuals::IndicateAngles()
 
 		if (render::WorldToScreen(real_pos, draw_tmp))
 		{
-			render::line(tmp.x, tmp.y, draw_tmp.x, draw_tmp.y, { 0, 255, 0, 255 });
+			render::line(tmp.x, tmp.y, draw_tmp.x, draw_tmp.y, { 255, 0, 0, 255 });
 			render::esp_small.string(draw_tmp.x, draw_tmp.y, { 255, 0, 0, 255 }, "FAKE", render::ALIGN_LEFT);
 		}
 
@@ -117,7 +117,7 @@ void Visuals::IndicateAngles()
 
 			if (render::WorldToScreen(fake_pos, draw_tmp))
 			{
-				render::line(tmp.x, tmp.y, draw_tmp.x, draw_tmp.y, { 255, 0, 0, 255 });
+				render::line(tmp.x, tmp.y, draw_tmp.x, draw_tmp.y, { 0, 255, 0, 255 });
 				render::esp_small.string(draw_tmp.x, draw_tmp.y, { 0, 255, 0, 255 }, "REAL", render::ALIGN_LEFT);
 			}
 		}
@@ -1090,7 +1090,7 @@ void Visuals::DrawItem(Weapon* item) {
 	}
 
 	// render bomb in green.
-	//if (g_menu.main.visuals.planted_c4.get() && item->is(HASH("CC4")))
+	if (item->is(HASH("CC4")))
 		render::menu.string(screen.x, screen.y, Color(col2.r(), col2.g(), col2.b(), alpha2), XOR("BOMB"), render::ALIGN_CENTER);
 
 	if (item->is(HASH("CC4")))
@@ -2214,11 +2214,10 @@ bool isc4(const int id)
 	return id == 29 || id == 108;
 }
 
-void Visuals::RenderGlow() {
+void Visuals::RenderGlow()
+{
 	Color   color;
 	Player* player;
-	const auto freq = g_menu.main.players.rainbow_speed.get(); /// Gradient speed (curr: 100%)
-	const auto real_time = g_csgo.m_globals->m_realtime * freq;
 
 	if (!g_cl.m_local)
 		return;
@@ -2228,100 +2227,46 @@ void Visuals::RenderGlow() {
 
 	float blend = g_menu.main.players.glow_blend.get() / 100.f;
 
-	for (int i{ }; i < g_csgo.m_glow->m_object_definitions.Count(); ++i) {
+	for (int i{ }; i < g_csgo.m_glow->m_object_definitions.Count(); ++i)
+	{
 		GlowObjectDefinition_t* obj = &g_csgo.m_glow->m_object_definitions[i];
 
-		if (obj->IsUnused() || !obj->m_entity)
+		// skip non-players.
+		if (!obj->m_entity || !obj->m_entity->IsPlayer())
 			continue;
 
-		const auto classid = obj->m_entity->GetClientClass()->m_ClassID;
+		// get player ptr.
+		player = obj->m_entity->as< Player* >();
 
-		if (is_grenade(classid) && g_menu.main.visuals.proj.get()) {
-			color = g_menu.main.visuals.proj_col.get();
+		if (player->m_bIsLocalPlayer())
+			continue;
 
-			float blend = g_menu.main.visuals.proj_col_slider.get() / 100.f;
+		// get reference to array variable.
+		float& opacity = m_opacities[player->index() - 1];
 
-			obj->m_render_occluded = true;
-			obj->m_render_unoccluded = false;
-			obj->m_render_full_bloom = false;
-			obj->m_color = { (float)color.r() / 255.f, (float)color.g() / 255.f, (float)color.b() / 255.f };
-			obj->m_alpha = blend;
-			obj->m_bloom_amount = 1.f;
-		}
+		bool enemy = player->enemy(g_cl.m_local);
 
-		//if (isc4(classid) && g_menu.main.visuals.planted_c4.get()) {
-			color = g_menu.main.visuals.bomb_col.get();
+		if (enemy && !g_menu.main.players.glow.get())
+			continue;
 
-			float blend = g_menu.main.visuals.bomb_col_glow_slider.get() / 100.f;
+		if (!enemy && !g_menu.main.players.glow.get())
+			continue;
 
-			obj->m_render_occluded = true;
-			obj->m_render_unoccluded = false;
-			obj->m_render_full_bloom = false;
-			obj->m_color = { (float)color.r() / 255.f, (float)color.g() / 255.f, (float)color.b() / 255.f };
-			obj->m_alpha = blend;
-			obj->m_bloom_amount = 1.f;
-		//}
+		// enemy color
+		if (enemy)
+			color = g_menu.main.players.glow_enemy.get();
 
-		if (obj->m_entity->IsBaseCombatWeapon() && g_menu.main.visuals.itemsglow.get()) {
-			color = g_menu.main.visuals.item_color.get();
-			float blend = g_menu.main.visuals.glow_color_alpha.get() / 100.f;
+		// friendly color
+		
 
-			obj->m_render_occluded = true;
-			obj->m_render_unoccluded = false;
-			obj->m_render_full_bloom = false;
-			obj->m_color = { (float)color.r() / 255.f, (float)color.g() / 255.f, (float)color.b() / 255.f };
-			obj->m_alpha = blend;
-			obj->m_bloom_amount = 1.f;
-		}
-
-		if (obj->m_entity->IsPlayer()) {
-
-			// skip non-players.
-			if (!obj->m_entity || !obj->m_entity->IsPlayer())
-				continue;
-
-			// get player ptr.
-			player = obj->m_entity->as< Player* >();
-
-			if (player->m_bIsLocalPlayer())
-				continue;
-
-			// get reference to array variable.
-			float& opacity = m_opacities[player->index()];
-
-			bool enemy = player->enemy(g_cl.m_local);
-
-			if (enemy && !g_menu.main.players.glow.get())
-				continue;
-
-			if (!enemy && !g_menu.main.players.teammates.get())
-				continue;
-
-			// enemy color
-			if (enemy)
-				color = g_menu.main.players.glow_enemy.get();
-
-			// friendly color
-			else
-				color = g_menu.main.players.glow_enemy.get();
-
-			const auto r = floor(sin(real_time + 0.f) * 16 + 88);
-			const auto g = floor(sin(real_time + 2.f) * 16 + 88);
-			const auto b = floor(sin(real_time + 4.f) * 16 + 88);
-
-			obj->m_render_occluded = true;
-			obj->m_render_unoccluded = false;
-			obj->m_render_full_bloom = false;
-			if (g_menu.main.players.rainbow_visuals.get(0)) {
-				obj->m_color = { r / 255.f, g / 255.f, b / 255.f };
-			}
-			else {
-				obj->m_color = { (float)color.r() / 255.f, (float)color.g() / 255.f, (float)color.b() / 255.f };
-			}
-			obj->m_alpha = opacity * blend;
-		}
+		obj->m_render_occluded = true;
+		obj->m_render_unoccluded = false;
+		obj->m_render_full_bloom = false;
+		obj->m_color = { (float)color.r() / 255.f, (float)color.g() / 255.f, (float)color.b() / 255.f };
+		obj->m_alpha = opacity * blend;
 	}
 }
+
 
 void Visuals::DrawBeams() {
 	size_t     impact_count;

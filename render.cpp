@@ -24,7 +24,7 @@ void render::init() {
 	menu_shade = Font(XOR("Tahoma"), 12, FW_NORMAL, FONTFLAG_DROPSHADOW);
 	esp =  Font(XOR("Small Fonts"), 9, FW_NORMAL, FONTFLAG_OUTLINE);
 	esp2 = Font(XOR("Small Fonts"), 9, FW_NORMAL, FONTFLAG_OUTLINE);
-	esp_small = Font(XOR("Small Fonts"), 11, FW_NORMAL, FONTFLAG_OUTLINE);
+	esp_small = Font(XOR("Small Fonts"), 9, FW_NORMAL, FONTFLAG_OUTLINE);
 	esp_small2 = Font(XOR("Small Fonts"), 10, FW_NORMAL, FONTFLAG_OUTLINE);
 	esp_name = Font(XOR("Verdana"), 12, FW_NORMAL, FONTFLAG_DROPSHADOW );
 	esp_other = Font(XOR("Verdana"), 12, FW_BOLD, FONTFLAG_DROPSHADOW );

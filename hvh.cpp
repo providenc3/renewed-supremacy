@@ -843,6 +843,13 @@ void HVH::DoRealAntiAim() {
 				break;
 			}
 
+			if (g_menu.main.antiaim.distortion.get()) {
+				
+					float sine = ((sin(g_csgo.m_globals->m_curtime * (g_menu.main.antiaim.distortion_speed.get() / 10.f)) + 1) / 2) * g_menu.main.antiaim.distortion_range.get();
+
+					g_cl.m_cmd->m_view_angles.y += sine - (g_menu.main.antiaim.distortion_range.get() / 2.f);
+			}
+
 
 			if (g_cl.m_hit_floor && g_menu.main.antiaim.body_yaw_fake.get())
 				g_cl.m_cmd->m_view_angles.y += g_csgo.RandomFloat( 135, 225 );

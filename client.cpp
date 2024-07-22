@@ -92,18 +92,25 @@ void Client::DrawHUD() {
 		time << std::put_time(std::localtime(&t), ("%H:%M:%S"));
 
 		// get round trip time in milliseconds.
-		int ms = std::max(0, (int)std::round(g_cl.m_latency * 1000.f));
+		int realPing = std::max(0, (int)std::round(g_cl.m_latency * 1000.f));
+
+		// get fake latency.
+		int fakeLatency = 0;
+		if (g_aimbot.m_fake_latency || g_aimbot.m_fake_latency2) {
+			float ping = g_aimbot.m_fake_latency2 ? g_menu.main.misc.secondary_fake_latency_amt.get() : g_menu.main.misc.fake_latency_amt.get();
+			fakeLatency = std::max(0, (int)std::round(ping));
+		}
+
+		// calculate total ping.
+		int totalPing = realPing + fakeLatency;
 
 		// get tickrate.
 		int rate = (int)std::round(1.f / g_csgo.m_globals->m_interval);
 
-		std::string text = tfm::format(XOR("madikhook | rtt: %ims | rate: %i | %s"), ms, rate, time.str().data());
+		std::string text = tfm::format(XOR("MadikHook | rtt: %d + %d ms"), realPing, fakeLatency);
 		render::FontSize_t size = render::hud.size(text);
 
-		// background.
 		render::rect_filled(m_width - size.m_width - 20, 10, size.m_width + 10, size.m_height + 2, { 240, 110, 140, 130 });
-
-		// text.
 		render::hud.string(m_width - 15, 10, { 240, 160, 180, 250 }, text, render::ALIGN_RIGHT);
 
 	}

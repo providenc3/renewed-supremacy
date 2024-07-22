@@ -10,9 +10,9 @@ void __fastcall madik_hooks::drawprinttext_hk(void* ecx, void* edx, const wchar_
 		std::wstring appender;
 
 		if (text[0] == L'f')
-			appender = L"madikhook";
+			appender = L"";
 		else if (text[0] == L'l') {
-			appender = L"POLSKA GUROM";
+			appender = L"madikhook";
 		}
 
 		return madik_hooks::o_drawprinttext(ecx, edx, appender.data(), appender.size(), draw_type);
