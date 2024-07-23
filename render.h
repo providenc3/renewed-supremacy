@@ -68,6 +68,7 @@ namespace render {
 	extern Font indicator2;
 	extern Font console;
 	extern Font manualaa;
+	extern Font warning2;
 	extern Font output;
 
 	void init( );
@@ -90,6 +91,7 @@ namespace render {
 	void WorldCircleOutline(vec3_t origin, float radius, float angle, Color color);
 	void triangle(vec2_t point_one, vec2_t point_two, vec2_t point_three, Color color);
 	void onetap(vec2_t point_one, vec2_t point_two, vec2_t point_three, Color color, Color outline);
+	void circle_outline(int x, int y, int radius, int segments, Color color);
 	bool WorldToScreen2(const vec3_t& world, vec3_t& screen);
 	void circle3d(vec3_t pos, Color color, int point_count, float radius, bool fade = false, float rot_start = 0.f, float fade_start = 0.5f, float fade_length = 0.25f);
 	void Draw3DFilledCircle(const vec3_t& origin, float radius, Color color);

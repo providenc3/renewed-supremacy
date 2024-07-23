@@ -32,10 +32,11 @@ public:
 
 	bool IsSideways(float angle, LagRecord* player);
 	void ResolveAngles(Player* player, LagRecord* record);
-	void ResolveAir(AimPlayer* data, LagRecord* record);
+	void ResolveAir(AimPlayer* data, LagRecord* record, Player* player);
 	void ResolveWalk(AimPlayer* data, LagRecord* record);
 	int GetNearestEntity(Player* player, LagRecord* record);
 	void ResolveStand(AimPlayer* data, LagRecord* record);
+	int	   iPlayers[64];
 };
 
 extern Resolver g_resolver;

@@ -956,8 +956,15 @@ void Visuals::DrawProjectile(Weapon* ent) {
 			// get molotov bounds (current radius).
 			ent->GetRenderBounds(mins, maxs);
 
+			static float rot_start = 0.f;
+			rot_start += 0.01f;
+
+			if (rot_start >= 1.f)
+				rot_start = 0.f;
+
 			// render the molotov range circle.
-			render::world_circle(origin, vec3_t(maxs - mins).length_2d() * 0.5, colors::red);
+			//render::world_circle(origin, vec3_t(maxs - mins).length_2d() * 0.5, colors::red);
+			render::circle3d(origin, colors::red, 88, vec3_t(maxs - mins).length_2d() * 0.5, true, rot_start, 0.25f, 0.25f);
 		}
 
 		const double spawn_time = *(float*)(uintptr_t(ent) + 0x20);
@@ -995,8 +1002,15 @@ void Visuals::DrawProjectile(Weapon* ent) {
 				if (1.0f > (18.041 - time_since_explosion))
 					radius = radius * (((18.041 - time_since_explosion) / 1.0f) * 0.3f + 0.7f);
 
+				static float rot_start = 0.f;
+				rot_start += 0.01f;
+
+				if (rot_start >= 1.f)
+					rot_start = 0.f;
+
 				// render the smoke range circle.
-				render::world_circle(origin, radius, colors::light_blue);
+				//render::world_circle(origin, radius, colors::light_blue);
+				render::circle3d(origin, colors::light_blue, 88, radius, true, rot_start, 0.25f, 0.25f);
 			}
 
 			if (g_menu.main.visuals.proj.get()) {

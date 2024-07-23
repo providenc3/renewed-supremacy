@@ -61,7 +61,10 @@ public:
 	int        m_shots;
 	int        m_missed_shots;
 	bool       m_moved;
-	MoveData_t m_walk_record;
+	//MoveData_t m_walk_record;
+	LagRecord m_walk_record;
+	int       m_air_index;
+	int m_air_brute_index;
 
 	// data about the LBY proxy.
 	float m_body_timer;

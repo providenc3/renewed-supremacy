@@ -147,107 +147,148 @@ const char* index_to_grenade_name_icon(int index)
 
 bool c_grenade_prediction::data_t::draw() const
 {
-    if (!g_menu.main.visuals.grenade_path.get())
-        return false;
+	if (!g_menu.main.visuals.grenade_path.get())
+		return false;
 
-    if (m_path.size() <= 1u || g_csgo.m_globals->m_curtime >= m_expire_time)
-        return false;
+	if (m_owner && m_owner->enemy(g_cl.m_local) && !m_owner->m_bIsLocalPlayer() && !g_cl.m_local->enemy(m_owner))
+		return false;
 
-    int dist = g_cl.m_local->m_vecOrigin().dist_to(m_origin) / 12;
+	if (m_path.size() <= 1u || g_csgo.m_globals->m_curtime >= m_expire_time)
+		return false;
 
-    auto prev_screen = vec2_t();
-    auto prev_on_screen = render::WorldToScreen(std::get< vec3_t >(m_path.front()), prev_screen);
+	int dist = g_cl.m_local->m_vecOrigin().dist_to(m_origin) / 12;
 
-    for (auto i = 1u; i < m_path.size(); ++i) {
-        auto cur_screen = vec2_t();
-        const auto cur_on_screen = render::WorldToScreen(std::get< vec3_t >(m_path.at(i)), cur_screen);
+	std::string distance;
+	distance = tfm::format(XOR("%i ft"), dist);
 
-        if (prev_on_screen && cur_on_screen) {
+	Color col = g_menu.main.visuals.proj_color.get(); // ( dont touch this leave it as it is ) 
+	col.a() = 0xb4;
 
-            if (g_menu.main.visuals.grenade_path.get()) {
+	if (dist > 10) {
+		col.a() *= std::clamp((10 - (dist - 15)) / 13.f, 0.f, 255.f);
+	}
 
-                float percent = ((m_expire_time - g_csgo.m_globals->m_curtime) / game::TICKS_TO_TIME(m_tick));
+	auto prev_screen = vec2_t();
+	auto prev_on_screen = render::WorldToScreen(std::get< vec3_t >(m_path.front()), prev_screen);
+	Color negro = g_menu.main.visuals.grenade_path_col.get();
 
-                Color retard = g_menu.main.visuals.grenade_path_col.get();
 
-                DrawBeamPaw(std::get< vec3_t >(m_path.at(i - 1)), std::get< vec3_t >(m_path.at(i)), Color(retard.r(), retard.g(), retard.b(), retard.a() * percent));
-            }
-        }
+	float percent = ((m_expire_time - g_csgo.m_globals->m_curtime) / game::TICKS_TO_TIME(m_tick));
+	int alpha_damage = 0;
 
-        prev_screen = cur_screen;
-        prev_on_screen = cur_on_screen;
-    }
-    float percent = ((m_expire_time - g_csgo.m_globals->m_curtime) / game::TICKS_TO_TIME(m_tick));
-    int alpha_damage = 0;
+	if (m_index == HEGRENADE && dist <= 20) {
+		alpha_damage = 50 - 255 * (dist / 20);
+	}
 
-    if (m_index == HEGRENADE && dist <= 20) {
-        alpha_damage = 50 - 255 * (dist / 20);
-    }
+	if ((m_index == MOLOTOV || m_index == FIREBOMB) && dist <= 15) {
+		alpha_damage = 50 - 255 * (dist / 15);
+	}
 
-    if ((m_index == MOLOTOV || m_index == FIREBOMB) && dist <= 15) {
-        alpha_damage = 50 - 255 * (dist / 15);
-    }
+	Color outline_warning = g_menu.main.visuals.grenade_path_col.get();
 
-    auto icon = index_to_grenade_name_icon(m_index);
+	if (dist < 30)
+		outline_warning = Color(194, 58, 58);
 
-    Color colorkurwa = g_menu.main.visuals.grenade_path_col.get();
+	Color fading_out = Color(31, 31, 31);
+	
 
-    //if (dist < 150) {
-    render::circle(prev_screen.x, prev_screen.y, 20, 360, Color(26, 26, 30, 200));
-    draw_arc(prev_screen.x, prev_screen.y, 20, 0, 360 * percent, 2, colorkurwa);
-    render::warning.string(prev_screen.x, prev_screen.y - render::warning.size(icon).m_height / 2.f, { 255,255,255,255 }, icon, render::ALIGN_CENTER);
-    // }
+	//if (percent > 1)
 
-    auto is_on_screen = [](vec3_t origin, vec2_t& screen) -> bool
-        {
-            if (!render::WorldToScreen(origin, screen))
-                return false;
+	//// Example usage
+	//float myPercent = 0.5f; // Change this value as needed
+	//Color myColor(31, 31, 31, 180); // Change this value as needed
 
-            return (screen.x > 0 && screen.x < g_cl.m_width) && (g_cl.m_height > screen.y && screen.y > 0);
-        };
+	//Color color1 = (31, 31, 31, 180);
+	//DecreaseAlpha(color1, percent);
 
-    vec2_t screenPos;
-    vec3_t vEnemyOrigin = m_origin;
-    vec3_t vLocalOrigin = g_cl.m_local->GetAbsOrigin();
-    if (!g_cl.m_local->alive())
-        vLocalOrigin = g_csgo.m_input->m_camera_offset;
 
-    if (!is_on_screen(vEnemyOrigin, screenPos))
-    {
-        const float wm = g_cl.m_width / 2, hm = g_cl.m_height / 2;
-        vec3_t last_pos = std::get< vec3_t >(m_path.at(m_path.size() - 1));
+	for (auto i = 1u; i < m_path.size(); ++i) {
+		auto cur_screen = vec2_t();
+		const auto cur_on_screen = render::WorldToScreen(std::get< vec3_t >(m_path.at(i)), cur_screen);
 
-        ang_t dir;
+		if (prev_on_screen && cur_on_screen) {
 
-        g_csgo.m_engine->GetViewAngles(dir);
+			if (g_menu.main.visuals.grenade_path.get()) {
+				//DrawBeamPaw(std::get< vec3_t >(m_path.at(i - 1)), std::get< vec3_t >(m_path.at(i)), negro); // beamcolor
 
-        float view_angle = dir.y;
+				render::line(prev_screen.x, prev_screen.y, cur_screen.x, cur_screen.y, negro);
+				render::line(prev_screen.x + 1, prev_screen.y, cur_screen.x, cur_screen.y, negro);
+				//render::line(prev_screen.x, prev_screen.y, cur_screen.x - 1, cur_screen.y - 1, { g_menu.main.misc.grenade_tracer_warning_color.get() });
+				//render::line(prev_screen.x + 1, prev_screen.y + 1, cur_screen.x, cur_screen.y, { g_menu.main.misc.grenade_tracer_warning_color.get() });
+				//render::line(prev_screen.x - 1, prev_screen.y - 1, cur_screen.x, cur_screen.y, { g_menu.main.misc.grenade_tracer_warning_color.get() });
+			}
+		}
 
-        if (view_angle < 0)
-            view_angle += 360;
+		prev_screen = cur_screen;
+		prev_on_screen = cur_on_screen;
+	}
 
-        view_angle = DEG2RAD(view_angle);
 
-        auto entity_angle = math::CalcAngle(vLocalOrigin, vEnemyOrigin);
-        entity_angle.normalize();
+	if (dist < 100) {
+		//draw_arc(prev_screen.x, prev_screen.y - 10, 21, 0, 360 * percent, 1, Color(255, 255, 255, 200));
+		render::circle(prev_screen.x, prev_screen.y - 10, 22, 360, Color(31, 31, 31, negro)); // set alpha of the color
+		render::warning.string(prev_screen.x - 8, prev_screen.y - 27, Color(255, 255, 255, negro), index_to_grenade_name_icon(m_index));
+		render::warning2.string(prev_screen.x - 12, prev_screen.y - 8, Color(167, 167, 171, negro), distance);//255,255,255
+		render::circle_outline(prev_screen.x, prev_screen.y - 10, 21, 180, Color(30, 30, 30, negro));
+		render::circle_outline(prev_screen.x, prev_screen.y - 10, 22, 180, Color(outline_warning.r(), outline_warning.g(), outline_warning.b(), 150 * percent));
+		render::circle_outline(prev_screen.x, prev_screen.y - 10, 23, 180, Color(outline_warning.r(), outline_warning.g(), outline_warning.b(), 100 * percent));
+		render::circle_outline(prev_screen.x, prev_screen.y - 10, 24, 180, Color(outline_warning.r(), outline_warning.g(), outline_warning.b(), 50 * percent));
+	}
 
-        if (entity_angle.y < 0.f)
-            entity_angle.y += 360.f;
 
-        entity_angle.y = DEG2RAD(entity_angle.y);
-        entity_angle.y -= view_angle;
 
-        auto position = vec2_t(wm, hm);
-        position.x -= std::clamp(vLocalOrigin.dist_to(vEnemyOrigin), 400.f, hm - 40);
+	auto is_on_screen = [](vec3_t origin, vec2_t& screen) -> bool
+		{
+			if (!render::WorldToScreen(origin, screen))
+				return false;
 
-        rotate_point(position, vec2_t(wm, hm), false, entity_angle.y);
+			return (screen.x > 0 && screen.x < g_cl.m_width) && (g_cl.m_height > screen.y && screen.y > 0);
+		};
 
-        if (dist < 45) {
-            render::circle(position.x, position.y, 20, 360, Color(26, 26, 30, 200));
-            draw_arc(position.x, position.y, 20, 0, 360 * percent, 2, Color(255, 255, 255, 225));
-            render::warning.string(position.x, position.y - render::warning.size(icon).m_height / 2.f, { 255,255,255,255 }, icon, render::ALIGN_CENTER);
-        }
+	vec2_t screenPos;
+	vec3_t vEnemyOrigin = m_origin;
+	vec3_t vLocalOrigin = g_cl.m_local->GetAbsOrigin();
+	if (!g_cl.m_local->alive())
+		vLocalOrigin = g_csgo.m_input->m_camera_offset;
 
-    }
-    return true;
+	if (!is_on_screen(vEnemyOrigin, screenPos))
+	{
+		const float wm = g_cl.m_width / 2, hm = g_cl.m_height / 2;
+		vec3_t last_pos = std::get< vec3_t >(m_path.at(m_path.size() - 1));
+
+		ang_t dir;
+
+		g_csgo.m_engine->GetViewAngles(dir);
+
+		float view_angle = dir.y;
+
+		if (view_angle < 0)
+			view_angle += 360;
+
+		view_angle = DEG2RAD(view_angle);
+
+		auto entity_angle = math::CalcAngle(vLocalOrigin, vEnemyOrigin);
+		entity_angle.normalize();
+
+		if (entity_angle.y < 0.f)
+			entity_angle.y += 360.f;
+
+		entity_angle.y = DEG2RAD(entity_angle.y);
+		entity_angle.y -= view_angle;
+
+		auto position = vec2_t(wm, hm);
+		position.x -= std::clamp(vLocalOrigin.dist_to(vEnemyOrigin), 400.f, hm - 40);
+
+		static auto alpha = 1.0f;
+		
+
+		rotate_point(position, vec2_t(wm, hm), false, entity_angle.y);
+
+		if (dist < 45) {
+			//draw_arc(position.x, position.y - 10, 19, 0, 360 * percent, 1.5, Color(255, 255, 255, 225));
+			render::warning.string(position.x - 4, position.y - 20, (242, 65, 65, 220), index_to_grenade_name_icon(m_index)); //255,255,255
+		}
+
+	}
+	return true;
 }

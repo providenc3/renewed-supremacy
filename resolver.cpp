@@ -418,7 +418,7 @@ void Resolver::ResolveAngles(Player* player, LagRecord* record) {
 		ResolveStand(data, record);
 		break;
 	case Modes::RESOLVE_AIR:
-		ResolveAir(data, record);
+		ResolveAir(data, record, player);
 		break;
 	case Modes::RESOLVE_OVERRIDE:
 		ResolveOverride(data, record, record->m_player);
@@ -442,122 +442,142 @@ void Resolver::ResolveAngles(Player* player, LagRecord* record) {
 	math::NormalizeAngle(record->m_eye_angles.y);
 }
 
-void Resolver::ResolveAir(AimPlayer* data, LagRecord* record) {
+void Resolver::ResolveAir(AimPlayer* data, LagRecord* record, Player* player) {
+	
 
+	float velyaw = math::rad_to_deg(std::atan2(record->m_velocity.y, record->m_velocity.x));
 
-	if (data->m_records.size() >= 2) {
-		LagRecord* previous = data->m_records[1].get();
-		const float lby_delta = math::AngleDiff(record->m_body, previous->m_body);
+	LagRecord* move = &data->m_walk_record;
+	LagRecord* previous = data->m_records.size() > 1 ? data->m_records[1].get()->dormant() ? nullptr : data->m_records[1].get() : nullptr;
 
-		const bool prev_ground = (previous->m_flags & FL_ONGROUND);
-		const bool curr_ground = (record->m_flags & FL_ONGROUND);
+	iPlayers[player->index()] = true;
 
-		if (std::fabs(lby_delta) > 12.5f
-			&& !previous->m_dormant
-			&& data->m_body_idx <= 0
-			&& prev_ground != curr_ground) {
-			record->m_eye_angles.y = record->m_body;
-			record->m_mode = Modes::RESOLVE_LBY;
-			record->m_resolver_mode = "A:LBYCHANGE";
+	float back_diff = fabsf(velyaw + 180.0f - record->m_body);
+
+	const Stage_t stage{};
+	if (stage != FRAME_NET_UPDATE_POSTDATAUPDATE_START)
+		return;
+
+	for (auto i = 1; i < g_csgo.m_globals->m_max_clients; i++)
+	{
+		if (player || g_csgo.IsLocalPlayer)
+			continue;
+
+		if (player->m_flSimulationTime() <= player->m_flOldSimulationTime())
+			continue;
+
+		if (!player->alive())
+			continue;
+
+		if (player->dormant())
+			continue;
+
+		const auto simulation_tick_delta = game::TICKS_TO_TIME(player->m_flSimulationTime() - player->m_flOldSimulationTime());
+		if (simulation_tick_delta > 15 && simulation_tick_delta < 2)
 			return;
+
+		auto in_air = false;
+		if (!(player->m_fFlags() & FL_ONGROUND) || !(record->m_pred_flags & FL_ONGROUND))
+			in_air = true;
+		auto ticks_left = static_cast<int>(simulation_tick_delta);
+		ticks_left = (ticks_left, 0, 10);
+		while (ticks_left > 0)
+		{
+			auto data_origin = player->m_vecOrigin();
+			auto data_velocity = player->m_vecAbsVelocity();
+			auto data_flags = player->m_fFlags();
+
+			player->m_flSimulationTime() += record->m_anim_time;
+			data_origin;
+			player->m_vecAbsVelocity() = data_velocity;
+			player->m_fFlags() = data_flags;
+			--ticks_left;
 		}
 	}
+	record->m_resolver_mode = XOR("air");
+	record->m_resolver_mode = "air";
 
-	// trust this will fix bhoppers
-	if (std::fabs(record->m_sim_time - data->m_walk_record.m_sim_time) > 1.5f)
-		data->m_walk_record.m_sim_time = -1.f;
+	if (record->m_velocity.length_2d() < 60.f) {
+		record->m_mode = Modes::RESOLVE_STAND;
 
-	// kys this is so dumb
-	const float back = math::CalcAngle(g_cl.m_shoot_pos, record->m_pred_origin).y;
-	const vec3_t delta = record->m_origin - data->m_walk_record.m_origin;
-	const float back_lby_delta = math::AngleDiff(back, record->m_body);
-	const bool avoid_lastmove = delta.length() >= 128.f;
+		// stand and getaway resolver
+		ResolveStand(data, record);
+		GetAwayAngle(record);
+		record->m_resolver_mode = "AIR";
+		return;
+	}
 
-	// try to predict the direction of the player based on his velocity direction.
-	// this should be a rough estimation of where he is looking.
-	const float velyaw = math::rad_to_deg(std::atan2(record->m_velocity.y, record->m_velocity.x));
-	const float velyaw_back = velyaw + 180.f;
+	record->m_mode = Modes::RESOLVE_AIR;
+	bool can_last_move_air = move->m_anim_time > 0.f &&
+		fabsf(move->m_body - record->m_body) < 12.5f
+		&& data->m_air_brute_index < 1;
 
-	// gay
-	const bool high_lm_delta = std::abs(math::AngleDiff(record->m_body, data->m_walk_record.m_body)) > 90.f;
-	const float back_lm_delta = data->m_walk_record.m_sim_time > 0.f ? math::AngleDiff(back, data->m_walk_record.m_body) : FLT_MAX;
-	const float movedir_lm_delta = data->m_walk_record.m_sim_time > 0.f ? math::AngleDiff(data->m_walk_record.m_body, velyaw + 180.f) : FLT_MAX;
+	if (back_diff <= 18.f && data->m_air_brute_index < 2) {
+		record->m_resolver_mode = XOR("AIR-BACK");
+		record->m_resolver_color = colors::transparent_green;
+		record->m_eye_angles.y = velyaw + 180.f;
+	}
+	else if (can_last_move_air)
+	{
+		record->m_resolver_mode = XOR("AIR-MOVE");
+		record->m_resolver_color = colors::transparent_green;
+		record->m_eye_angles.y = move->m_body;
+	}
+	else
+	{
+		switch (data->m_air_brute_index % 3) {
+		case 0:
+			record->m_resolver_mode = XOR("BAIR-BACK");
+			record->m_resolver_color = colors::transparent_green;
+			record->m_eye_angles.y = velyaw + 180.f;
+			break;
+		case 1:
+			record->m_resolver_mode = XOR("BAIR-LBYPOS");
+			record->m_resolver_color = colors::red;
+			record->m_eye_angles.y = record->m_body + 35.f;
+			break;
+		case 2:
+			record->m_resolver_mode = XOR("BAIR-LBYNEG");
+			record->m_resolver_color = colors::red;
+			record->m_eye_angles.y = record->m_body - 35.f;
+			break;
+		default:
+			break;
+		}
 
-	switch (data->m_air_idx % 2) {
-	case 0:
-		if (((avoid_lastmove || high_lm_delta)
-			&& std::fabs(record->m_sim_time - data->m_walk_record.m_sim_time) > 1.5f)
-			|| data->m_walk_record.m_sim_time <= 0.f) {
+		float away = GetAwayAngle(record);
+		const float flVelocityDirYaw = math::rad_to_deg(std::atan2(player->m_vecVelocity().x, player->m_vecVelocity().y));
 
-			// angle too low to overlap with
-			if (std::fabs(back_lby_delta) <= 15.f || std::abs(back_lm_delta) <= 15.f) {
-				record->m_eye_angles.y = back;
-				record->m_resolver_mode = "A:BACK";
+		switch (data->m_air_index % 3) {
+		case 0:
+			record->m_eye_angles.y = record->m_player->m_flLowerBodyYawTarget();
+			record->m_resolver_mode = "AIR:KAABA:1";
+			record->m_resolver_color = colors::orange;
+			break;
+		case 1:
+			if (move->m_body < FLT_MAX && abs(math::AngleDiff(player->m_flLowerBodyYawTarget(), move->m_body)) > 60.f) {
+				record->m_resolver_mode = "AIR:KAABA:2:LM";
+				record->m_resolver_color = colors::orange;
+				record->m_eye_angles.y = move->m_body;
 			}
 			else {
-
-				// angle high enough to do some overlappings.
-				if (std::fabs(back_lby_delta) <= 60.f || std::abs(back_lm_delta) <= 60.f) {
-
-					const float overlap = std::abs(back_lm_delta) <= 60.f ? (std::abs(back_lm_delta) / 2.f) : (std::abs(back_lby_delta) / 2.f);
-
-					if (back_lby_delta < 0.f) {
-						record->m_eye_angles.y = back - overlap;
-						record->m_resolver_mode = "A:OVERLAP-LEFT";
-					}
-					else {
-						record->m_eye_angles.y = back + overlap;
-						record->m_resolver_mode = "A:OVERLAP-RIGHT";
-					}
-				}
-				else {
-
-					if (std::abs(movedir_lm_delta) <= 90.f) {
-
-						if (std::abs(movedir_lm_delta) <= 15.f) {
-							record->m_eye_angles.y = data->m_walk_record.m_body;
-							record->m_resolver_mode = "A:TEST-LBY";
-						}
-						else {
-
-							if (movedir_lm_delta > 0.f) {
-								record->m_eye_angles.y = velyaw_back + (std::abs(movedir_lm_delta) / 2.f);
-								record->m_resolver_mode = "A:MOVEDIR_P";
-							}
-							else {
-								record->m_eye_angles.y = velyaw_back - (std::abs(movedir_lm_delta) / 2.f);
-								record->m_resolver_mode = "A:MOVEDIR_N";
-							}
-						}
-					}
-					else {
-						// record->m_eye_angles.y = record->m_body;
-						// record->m_resolver_mode = "A:LBY";
-						record->m_eye_angles.y = velyaw + 180.f;
-						record->m_resolver_mode = "A:MOVEDIR";
-					}
-				}
+				record->m_eye_angles.y = away + 180.f;
+				record->m_resolver_mode = "AIR:KAABA:2:AWAY";
+				record->m_resolver_color = colors::orange;
 			}
+			break;
+		case 2:
+			record->m_resolver_mode = "AIR:KAABA:AWAY";
+			record->m_resolver_color = colors::orange;
+			record->m_eye_angles.y = away;
+			break;
+		case 3:
+			record->m_resolver_mode = "AIR:KAABA:VELYAW";
+			record->m_resolver_color = colors::orange;
+			record->m_eye_angles.y = flVelocityDirYaw - 180.f;
+			break;
 		}
-		else {
-
-
-			if (data->m_walk_record.m_sim_time > 0.f) {
-				record->m_eye_angles.y = data->m_walk_record.m_body;
-				record->m_resolver_mode = "A:LAST";
-
-			}
-			else {
-				record->m_eye_angles.y = back;
-				record->m_resolver_mode = "A:FALLBACK";
-			}
-		}
-		break;
-	case 1:
-		record->m_eye_angles.y = back;
-		record->m_resolver_mode = "A:BACK-BRUTE";
-		break;
-	} // lby brute is dogshit and i never hit a shot with it
+	}
 }
 
 void Resolver::ResolveWalk(AimPlayer* data, LagRecord* record) {

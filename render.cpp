@@ -10,6 +10,7 @@ namespace render {
 	Font esp_name;;
 	Font esp_other;;
 	Font warning;;
+	Font warning2;;
 	Font hud;;
 	Font cs;;
 	Font indicator;;
@@ -35,6 +36,7 @@ void render::init() {
 	console = Font(XOR("Lucida Console"), 10, FW_DONTCARE, FONTFLAG_DROPSHADOW);
 	output = Font(XOR("Verdana"), 12, FW_BOLD, FONTFLAG_OUTLINE);
 	warning = Font(XOR("undefeated"), 22, FW_SEMIBOLD, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
+	warning2 = Font(XOR("Verdana"), 12, FW_NORMAL, FONTFLAG_DROPSHADOW);
 }
 
 void render::world_circle(vec3_t origin, float radius, Color color) {
@@ -54,6 +56,11 @@ void render::world_circle(vec3_t origin, float radius, Color color) {
 			previous_screen_pos = screen_pos;
 		}
 	}
+}
+
+void render::circle_outline(int x, int y, int radius, int segments, Color color) {
+	g_csgo.m_surface->DrawSetColor(color);
+	g_csgo.m_surface->DrawOutlinedCircle(x, y, radius, segments);
 }
 
 void render::circle3d(vec3_t pos, Color color, int point_count, float radius, bool fade, float rot_start, float fade_start, float fade_length)
