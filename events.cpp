@@ -336,7 +336,7 @@ void events::player_death( IGameEvent* evt ) {
 
 
 
-			switch (rand() % 12) {
+			switch (rand() % 2) {
 			case 0:
 				g_csgo.m_engine->ExecuteClientCmd("say god i wish i had madikhook");
 				break;

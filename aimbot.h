@@ -65,6 +65,7 @@ public:
 	LagRecord m_walk_record;
 	int       m_air_index;
 	int m_air_brute_index;
+	int m_stored_body_update;
 
 	// data about the LBY proxy.
 	float m_body_timer;
