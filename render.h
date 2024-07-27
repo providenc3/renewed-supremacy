@@ -1,4 +1,5 @@
 #pragma once
+#define ZERO vec3_t(0.0f, 0.0f, 0.0f)
 
 struct Point {
 	int x;
@@ -92,6 +93,9 @@ namespace render {
 	void triangle(vec2_t point_one, vec2_t point_two, vec2_t point_three, Color color);
 	void onetap(vec2_t point_one, vec2_t point_two, vec2_t point_three, Color color, Color outline);
 	void circle_outline(int x, int y, int radius, int segments, Color color);
+	void draw_3d_circle_gradient(const vec3_t& origin, float radius, Color color, float alpha_multiplier);
+	void draw_3d_circle(const vec3_t& origin, float radius, Color color);
+	bool world_to_screen_3d(const vec3_t& world, vec3_t& screen);
 	bool WorldToScreen2(const vec3_t& world, vec3_t& screen);
 	void circle3d(vec3_t pos, Color color, int point_count, float radius, bool fade = false, float rot_start = 0.f, float fade_start = 0.5f, float fade_length = 0.25f);
 	void Draw3DFilledCircle(const vec3_t& origin, float radius, Color color);

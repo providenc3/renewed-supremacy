@@ -63,6 +63,85 @@ void render::circle_outline(int x, int y, int radius, int segments, Color color)
 	g_csgo.m_surface->DrawOutlinedCircle(x, y, radius, segments);
 }
 
+
+
+bool render::world_to_screen_3d(const vec3_t& world, vec3_t& screen) {
+	float w;
+
+	const VMatrix& matrix = g_csgo.m_engine->WorldToScreenMatrix();
+
+	// check if it's in view first.
+	// note - dex; w is below 0 when world position is around -90 / +90 from the player's camera on the y axis.
+	w = matrix[3][0] * world.x + matrix[3][1] * world.y + matrix[3][2] * world.z + matrix[3][3];
+	if (w < 0.001f)
+		return false;
+
+	// calculate x and y.
+	screen.x = matrix[0][0] * world.x + matrix[0][1] * world.y + matrix[0][2] * world.z + matrix[0][3];
+	screen.y = matrix[1][0] * world.x + matrix[1][1] * world.y + matrix[1][2] * world.z + matrix[1][3];
+
+	screen /= w;
+
+	// calculate screen position.
+	screen.x = (g_cl.m_width / 2) + (screen.x * g_cl.m_width) / 2;
+	screen.y = (g_cl.m_height / 2) - (screen.y * g_cl.m_height) / 2;
+
+	return true;
+}
+
+void render::draw_3d_circle(const vec3_t& origin, float radius, Color color)
+{
+
+	auto g_VGuiSurface = g_csgo.m_surface;
+	static auto prevScreenPos = ZERO; //-V656
+	static auto step = M_PI * 2.0f;
+
+	auto screenPos = ZERO;
+	auto screen = ZERO;
+
+	if (!render::world_to_screen_3d(origin, screen))
+		return;
+
+	std::vector<vec2_t> temppoints;
+	std::vector<Vertex> vertices;
+
+	for (auto rotation = 0.0f; rotation <= M_PI * 2.0f; rotation += step / 18.0f) //-V1034
+	{
+		const auto& point3d = vec3_t(sin(rotation), cos(rotation), 0.f) * radius;
+
+		if (render::world_to_screen_3d(origin + point3d, screenPos))
+		{
+			temppoints.push_back(vec2_t(screenPos.x, screenPos.y));
+		}
+	}
+
+	for (int i = 0; i < temppoints.size(); i++)
+	{
+		vertices.emplace_back(Vertex(temppoints[i]));
+	}
+
+	g_VGuiSurface->DrawSetColor(color);
+	g_VGuiSurface->DrawTexturedPolygon(vertices.size(), vertices.data());
+}
+
+void render::draw_3d_circle_gradient(const vec3_t& origin, float radius, Color color, float alpha_multiplier)
+{
+	static auto prevScreenPos = ZERO; //-V656
+	static auto step = M_PI * 2.0f / 60.0f;
+
+	auto screenPos = ZERO;
+
+	//const auto radius_step = radius / 63.f;
+	float rad = radius - 1.f;
+
+	for (int i = 1; i < radius; i++) {
+		if (rad > 2.f)
+			draw_3d_circle(origin, round(rad), Color(color.r(), color.g(), color.b(), (int)(i * alpha_multiplier)));
+
+		rad -= 1.f;
+	}
+}
+
 void render::circle3d(vec3_t pos, Color color, int point_count, float radius, bool fade, float rot_start, float fade_start, float fade_length)
 {
 	float step = math::pi * 2.0f / point_count;

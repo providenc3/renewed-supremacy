@@ -137,8 +137,10 @@ void Visuals::IndicateAngles()
 	}
 }
 
-void Visuals::ThirdpersonThink()
-{
+
+
+
+void Visuals::ThirdpersonThink() {
 	ang_t                          offset;
 	vec3_t                         origin, forward;
 	static CTraceFilterSimple_game filter{ };
@@ -149,24 +151,23 @@ void Visuals::ThirdpersonThink()
 		return;
 
 	// check if we have a local player and he is alive.
-	bool alive = g_cl.m_local && g_cl.m_local->alive();
+	bool alive = g_cl.m_processing;
+
+	
 
 	// camera should be in thirdperson.
-	if (m_thirdperson)
-	{
+	if (m_thirdperson) {
 
 		// if alive and not in thirdperson already switch to thirdperson.
 		if (alive && !g_csgo.m_input->CAM_IsThirdPerson())
 			g_csgo.m_input->CAM_ToThirdPerson();
 
 		// if dead and spectating in firstperson switch to thirdperson.
-		else if (g_cl.m_local->m_iObserverMode() == 4)
-		{
+		else if (g_cl.m_local->m_iObserverMode() == 4) {
 
 			// if in thirdperson, switch to firstperson.
 			// we need to disable thirdperson to spectate properly.
-			if (g_csgo.m_input->CAM_IsThirdPerson())
-			{
+			if (g_csgo.m_input->CAM_IsThirdPerson()) {
 				g_csgo.m_input->CAM_ToFirstPerson();
 				g_csgo.m_input->m_camera_offset.z = 0.f;
 			}
@@ -176,15 +177,13 @@ void Visuals::ThirdpersonThink()
 	}
 
 	// camera should be in firstperson.
-	else if (g_csgo.m_input->CAM_IsThirdPerson())
-	{
+	else if (g_csgo.m_input->CAM_IsThirdPerson()) {
 		g_csgo.m_input->CAM_ToFirstPerson();
 		g_csgo.m_input->m_camera_offset.z = 0.f;
 	}
 
 	// if after all of this we are still in thirdperson.
-	if (g_csgo.m_input->CAM_IsThirdPerson())
-	{
+	if (g_csgo.m_input->CAM_IsThirdPerson()) {
 		// get camera angles.
 		g_csgo.m_engine->GetViewAngles(offset);
 
@@ -214,7 +213,6 @@ void Visuals::ThirdpersonThink()
 		// override camera angles.
 		g_csgo.m_input->m_camera_offset = { offset.x, offset.y, offset.z };
 	}
-
 }
 
 constexpr int linesize = 8, linedec = 4;
@@ -1040,24 +1038,23 @@ void Visuals::AutopeekIndicator() {
 
 	static auto position = vec3_t(0.f, 0.f, 0.f);
 
-	if (!g_movement.start_position.IsZero())
+	if (!g_movement.start_position.is_zero())
 		position = g_movement.start_position;
 
-	if (position.IsZero())
+	if (position.is_zero())
 		return;
 
 	static auto alpha = 0.0f;
+	static float auto_peek_radius = 0.f;
+	float multiplier = static_cast<float>((1.0f / 0.05f) * g_csgo.m_globals->m_frametime);
+	if (g_input.GetKeyState(g_menu.main.aimbot.quickpeekassist.get())) {
+	
 
-	if (g_input.GetKeyState(g_menu.main.aimbot.quickpeekassist.get()) || alpha) {
+	Color clr = g_menu.main.aimbot.autopeek_active.get();
 
-		if (g_input.GetKeyState(g_menu.main.aimbot.quickpeekassist.get()))
-			alpha += 85.0f * g_csgo.m_globals->m_frametime;
-		else
-			alpha -= 85.0f * g_csgo.m_globals->m_frametime;
-
-		alpha = math::dont_break(alpha, 0.0f, 15.0f);
-		render::Draw3DFilledCircle(position, alpha, g_menu.main.aimbot.autopeek_active.get());
-		//render::Draw3DCircle(position, 15.0f, outer_color);
+	
+		//render::draw_dynamic_filed_circle(position, 15.f * auto_peek_radius, Color(clr.r(), clr.g(), clr.b(), 255), Color(clr.r(), clr.g(), clr.b(), 80));
+		render::draw_3d_circle_gradient(position, 32, clr, 2.f);
 	}
 }
 

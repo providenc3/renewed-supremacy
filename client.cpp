@@ -411,7 +411,11 @@ void Client::DoMove() {
 	penetration::PenetrationOutput_t tmp_pen_data{ };
 
 	// backup strafe angles (we need them for input prediction)
-	m_strafe_angles = m_cmd->m_view_angles;
+	
+	g_movement.FakeWalk();
+	g_movement.FastStop();
+	g_movement.JumpRelated();
+	g_movement.AutoStop();
 
 	if (!(m_flags & FL_ONGROUND) && g_input.GetKeyState(g_menu.main.misc.instant_stop_in_air.get()))
 		g_aimbot.m_stop_air = true;
@@ -426,12 +430,10 @@ void Client::DoMove() {
 
 
 	// run movement code before input prediction.
-	g_movement.JumpRelated();
+	m_strafe_angles = m_cmd->m_view_angles;
 	g_movement.Strafe();
-	g_movement.FakeWalk();
-	g_movement.AutoStop();
 	g_movement.quickpeekassist(g_cl.m_cmd, m_strafe_angles.y);
-	g_movement.FastStop();
+	
 
 	g_aimbot.m_stop_air = false;
 	g_aimbot.m_stop = false;
@@ -558,7 +560,7 @@ void Client::EndMove(CUserCmd* cmd) {
 
 	// store some values for next tick.
 	m_old_packet = *m_packet;
-	m_old_shot = m_buttons & IN_ATTACK && g_cl.m_weapon_fire;
+	m_old_shot = m_shot;
 }
 
 void Client::OnTick(CUserCmd* cmd) {
