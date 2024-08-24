@@ -1300,6 +1300,7 @@ public:
 class SkinsTab : public Tab {
 public:
 	Checkbox enable;
+	Checkbox custom_paintkit;
 
 	Edit     id_deagle;
 	Checkbox stattrak_deagle;
@@ -1335,6 +1336,10 @@ public:
 	Checkbox stattrak_awp;
 	Slider   quality_awp;
 	Slider	 seed_awp;
+	Colorpicker    awp_color;
+	Colorpicker    awp_color1;
+	Colorpicker    awp_color2;
+	Colorpicker    awp_color3;
 
 	Edit     id_famas;
 	Checkbox stattrak_famas;
@@ -1345,6 +1350,10 @@ public:
 	Checkbox stattrak_g3sg1;
 	Slider   quality_g3sg1;
 	Slider	 seed_g3sg1;
+	Colorpicker    g3sg1_color;
+	Colorpicker    g3sg1_color1;
+	Colorpicker    g3sg1_color2;
+	Colorpicker    g3sg1_color3;
 
 	Edit     id_galil;
 	Checkbox stattrak_galil;
@@ -1435,6 +1444,10 @@ public:
 	Checkbox stattrak_scar20;
 	Slider   quality_scar20;
 	Slider	 seed_scar20;
+	Colorpicker    scar20_color;
+	Colorpicker    scar20_color1;
+	Colorpicker    scar20_color2;
+	Colorpicker    scar20_color3;
 
 	Edit     id_sg553;
 	Checkbox stattrak_sg553;
@@ -1445,6 +1458,10 @@ public:
 	Checkbox stattrak_ssg08;
 	Slider   quality_ssg08;
 	Slider	 seed_ssg08;
+	Colorpicker    ssg08_color;
+	Colorpicker    ssg08_color1;
+	Colorpicker    ssg08_color2;
+	Colorpicker    ssg08_color3;
 
 	Edit     id_m4a1s;
 	Checkbox stattrak_m4a1s;
@@ -1522,886 +1539,970 @@ public:
 	Edit	 glove_id;
 
 public:
-	void init( ) {
-		SetTitle( XOR( "skins" ) );
+	void init() {
+		SetTitle(XOR("skins"));
 
-		enable.setup( XOR( "enable" ), XOR( "skins_enable" ) );
-		enable.SetCallback( callbacks::ForceFullUpdate );
-		RegisterElement( &enable );
+		enable.setup(XOR("enable"), XOR("skins_enable"));
+		enable.SetCallback(callbacks::ForceFullUpdate);
+		RegisterElement(&enable);
+
+		custom_paintkit.setup(XOR("custom paint-kit color"), XOR("custom_paintkit"));
+		custom_paintkit.SetCallback(callbacks::ForceFullUpdate);
+		RegisterElement(&custom_paintkit);
 
 		// weapons...
-		id_deagle.setup( XOR( "paintkit id" ), XOR( "id_deagle" ), 3 );
-		id_deagle.SetCallback( callbacks::SkinUpdate );
-		id_deagle.AddShowCallback( callbacks::DEAGLE );
-		RegisterElement( &id_deagle );
-
-		stattrak_deagle.setup( XOR( "stattrak" ), XOR( "stattrak_deagle" ) );
-		stattrak_deagle.SetCallback( callbacks::SkinUpdate );
-		stattrak_deagle.AddShowCallback( callbacks::DEAGLE );
-		RegisterElement( &stattrak_deagle );
-
-		quality_deagle.setup( XOR( "quality" ), XOR( "quality_deagle" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_deagle.SetCallback( callbacks::SkinUpdate );
-		quality_deagle.AddShowCallback( callbacks::DEAGLE );
-		RegisterElement( &quality_deagle );
-
-		seed_deagle.setup( XOR( "seed" ), XOR( "seed_deagle" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_deagle.SetCallback( callbacks::SkinUpdate );
-		seed_deagle.AddShowCallback( callbacks::DEAGLE );
-		RegisterElement( &seed_deagle );
-
-		id_elite.setup( XOR( "paintkit id" ), XOR( "id_elite" ), 3 );
-		id_elite.SetCallback( callbacks::SkinUpdate );
-		id_elite.AddShowCallback( callbacks::ELITE );
-		RegisterElement( &id_elite );
-
-		stattrak_elite.setup( XOR( "stattrak" ), XOR( "stattrak_elite" ) );
-		stattrak_elite.SetCallback( callbacks::SkinUpdate );
-		stattrak_elite.AddShowCallback( callbacks::ELITE );
-		RegisterElement( &stattrak_elite );
-
-		quality_elite.setup( XOR( "quality" ), XOR( "quality_elite" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_elite.SetCallback( callbacks::SkinUpdate );
-		quality_elite.AddShowCallback( callbacks::ELITE );
-		RegisterElement( &quality_elite );
-
-		seed_elite.setup( XOR( "seed" ), XOR( "seed_elite" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_elite.SetCallback( callbacks::SkinUpdate );
-		seed_elite.AddShowCallback( callbacks::ELITE );
-		RegisterElement( &seed_elite );
-
-		id_fiveseven.setup( XOR( "paintkit id" ), XOR( "id_fiveseven" ), 3 );
-		id_fiveseven.SetCallback( callbacks::SkinUpdate );
-		id_fiveseven.AddShowCallback( callbacks::FIVESEVEN );
-		RegisterElement( &id_fiveseven );
-
-		stattrak_fiveseven.setup( XOR( "stattrak" ), XOR( "stattrak_fiveseven" ) );
-		stattrak_fiveseven.SetCallback( callbacks::SkinUpdate );
-		stattrak_fiveseven.AddShowCallback( callbacks::FIVESEVEN );
-		RegisterElement( &stattrak_fiveseven );
-
-		quality_fiveseven.setup( XOR( "quality" ), XOR( "quality_fiveseven" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_fiveseven.SetCallback( callbacks::SkinUpdate );
-		quality_fiveseven.AddShowCallback( callbacks::FIVESEVEN );
-		RegisterElement( &quality_fiveseven );
-
-		seed_fiveseven.setup( XOR( "seed" ), XOR( "seed_fiveseven" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_fiveseven.SetCallback( callbacks::SkinUpdate );
-		seed_fiveseven.AddShowCallback( callbacks::FIVESEVEN );
-		RegisterElement( &seed_fiveseven );
-
-		id_glock.setup( XOR( "paintkit id" ), XOR( "id_glock" ), 3 );
-		id_glock.SetCallback( callbacks::SkinUpdate );
-		id_glock.AddShowCallback( callbacks::GLOCK );
-		RegisterElement( &id_glock );
-
-		stattrak_glock.setup( XOR( "stattrak" ), XOR( "stattrak_glock" ) );
-		stattrak_glock.SetCallback( callbacks::SkinUpdate );
-		stattrak_glock.AddShowCallback( callbacks::GLOCK );
-		RegisterElement( &stattrak_glock );
-
-		quality_glock.setup( XOR( "quality" ), XOR( "quality_glock" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_glock.SetCallback( callbacks::SkinUpdate );
-		quality_glock.AddShowCallback( callbacks::GLOCK );
-		RegisterElement( &quality_glock );
-
-		seed_glock.setup( XOR( "seed" ), XOR( "seed_glock" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_glock.SetCallback( callbacks::SkinUpdate );
-		seed_glock.AddShowCallback( callbacks::GLOCK );
-		RegisterElement( &seed_glock );
-
-		id_ak47.setup( XOR( "paintkit id" ), XOR( "id_ak47" ), 3 );
-		id_ak47.SetCallback( callbacks::SkinUpdate );
-		id_ak47.AddShowCallback( callbacks::AK47 );
-		RegisterElement( &id_ak47 );
-
-		stattrak_ak47.setup( XOR( "stattrak" ), XOR( "stattrak_ak47" ) );
-		stattrak_ak47.SetCallback( callbacks::SkinUpdate );
-		stattrak_ak47.AddShowCallback( callbacks::AK47 );
-		RegisterElement( &stattrak_ak47 );
-
-		quality_ak47.setup( XOR( "quality" ), XOR( "quality_ak47" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_ak47.SetCallback( callbacks::SkinUpdate );
-		quality_ak47.AddShowCallback( callbacks::AK47 );
-		RegisterElement( &quality_ak47 );
-
-		seed_ak47.setup( XOR( "seed" ), XOR( "seed_ak47" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_ak47.SetCallback( callbacks::SkinUpdate );
-		seed_ak47.AddShowCallback( callbacks::AK47 );
-		RegisterElement( &seed_ak47 );
-
-		id_aug.setup( XOR( "paintkit id" ), XOR( "id_aug" ), 3 );
-		id_aug.SetCallback( callbacks::SkinUpdate );
-		id_aug.AddShowCallback( callbacks::AUG );
-		RegisterElement( &id_aug );
-
-		stattrak_aug.setup( XOR( "stattrak" ), XOR( "stattrak_aug" ) );
-		stattrak_aug.SetCallback( callbacks::SkinUpdate );
-		stattrak_aug.AddShowCallback( callbacks::AUG );
-		RegisterElement( &stattrak_aug );
-
-		quality_aug.setup( XOR( "quality" ), XOR( "quality_aug" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_aug.SetCallback( callbacks::SkinUpdate );
-		quality_aug.AddShowCallback( callbacks::AUG );
-		RegisterElement( &quality_aug );
-
-		seed_aug.setup( XOR( "seed" ), XOR( "seed_aug" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_aug.SetCallback( callbacks::SkinUpdate );
-		seed_aug.AddShowCallback( callbacks::AUG );
-		RegisterElement( &seed_aug );
-
-		id_awp.setup( XOR( "paintkit id" ), XOR( "id_awp" ), 3 );
-		id_awp.SetCallback( callbacks::SkinUpdate );
-		id_awp.AddShowCallback( callbacks::AWP );
-		RegisterElement( &id_awp );
-
-		stattrak_awp.setup( XOR( "stattrak" ), XOR( "stattrak_awp" ) );
-		stattrak_awp.SetCallback( callbacks::SkinUpdate );
-		stattrak_awp.AddShowCallback( callbacks::AWP );
-		RegisterElement( &stattrak_awp );
-
-		quality_awp.setup( XOR( "quality" ), XOR( "quality_awp" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_awp.SetCallback( callbacks::SkinUpdate );
-		quality_awp.AddShowCallback( callbacks::AWP );
-		RegisterElement( &quality_awp );
-
-		seed_awp.setup( XOR( "seed" ), XOR( "seed_awp" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_awp.SetCallback( callbacks::SkinUpdate );
-		seed_awp.AddShowCallback( callbacks::AWP );
-		RegisterElement( &seed_awp );
-
-		id_famas.setup( XOR( "paintkit id" ), XOR( "id_famas" ), 3 );
-		id_famas.SetCallback( callbacks::SkinUpdate );
-		id_famas.AddShowCallback( callbacks::FAMAS );
-		RegisterElement( &id_famas );
-
-		stattrak_famas.setup( XOR( "stattrak" ), XOR( "stattrak_famas" ) );
-		stattrak_famas.SetCallback( callbacks::SkinUpdate );
-		stattrak_famas.AddShowCallback( callbacks::FAMAS );
-		RegisterElement( &stattrak_famas );
-
-		quality_famas.setup( XOR( "quality" ), XOR( "quality_famas" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_famas.SetCallback( callbacks::SkinUpdate );
-		quality_famas.AddShowCallback( callbacks::FAMAS );
-		RegisterElement( &quality_famas );
-
-		seed_famas.setup( XOR( "seed" ), XOR( "seed_famas" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_famas.SetCallback( callbacks::SkinUpdate );
-		seed_famas.AddShowCallback( callbacks::FAMAS );
-		RegisterElement( &seed_famas );
-
-		id_g3sg1.setup( XOR( "paintkit id" ), XOR( "id_g3sg1" ), 3 );
-		id_g3sg1.SetCallback( callbacks::SkinUpdate );
-		id_g3sg1.AddShowCallback( callbacks::G3SG1 );
-		RegisterElement( &id_g3sg1 );
-
-		stattrak_g3sg1.setup( XOR( "stattrak" ), XOR( "stattrak_g3sg1" ) );
-		stattrak_g3sg1.SetCallback( callbacks::SkinUpdate );
-		stattrak_g3sg1.AddShowCallback( callbacks::G3SG1 );
-		RegisterElement( &stattrak_g3sg1 );
-
-		quality_g3sg1.setup( XOR( "quality" ), XOR( "quality_g3sg1" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_g3sg1.SetCallback( callbacks::SkinUpdate );
-		quality_g3sg1.AddShowCallback( callbacks::G3SG1 );
-		RegisterElement( &quality_g3sg1 );
-
-		seed_g3sg1.setup( XOR( "seed" ), XOR( "seed_g3sg1" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_g3sg1.SetCallback( callbacks::SkinUpdate );
-		seed_g3sg1.AddShowCallback( callbacks::G3SG1 );
-		RegisterElement( &seed_g3sg1 );
-
-		id_galil.setup( XOR( "paintkit id" ), XOR( "id_galil" ), 3 );
-		id_galil.SetCallback( callbacks::SkinUpdate );
-		id_galil.AddShowCallback( callbacks::GALIL );
-		RegisterElement( &id_galil );
-
-		stattrak_galil.setup( XOR( "stattrak" ), XOR( "stattrak_galil" ) );
-		stattrak_galil.SetCallback( callbacks::SkinUpdate );
-		stattrak_galil.AddShowCallback( callbacks::GALIL );
-		RegisterElement( &stattrak_galil );
-
-		quality_galil.setup( XOR( "quality" ), XOR( "quality_galil" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_galil.SetCallback( callbacks::SkinUpdate );
-		quality_galil.AddShowCallback( callbacks::GALIL );
-		RegisterElement( &quality_galil );
-
-		seed_galil.setup( XOR( "seed" ), XOR( "seed_galil" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_galil.SetCallback( callbacks::SkinUpdate );
-		seed_galil.AddShowCallback( callbacks::GALIL );
-		RegisterElement( &seed_galil );
-
-		id_m249.setup( XOR( "paintkit id" ), XOR( "id_m249" ), 3 );
-		id_m249.SetCallback( callbacks::SkinUpdate );
-		id_m249.AddShowCallback( callbacks::M249 );
-		RegisterElement( &id_m249 );
-
-		stattrak_m249.setup( XOR( "stattrak" ), XOR( "stattrak_m249" ) );
-		stattrak_m249.SetCallback( callbacks::SkinUpdate );
-		stattrak_m249.AddShowCallback( callbacks::M249 );
-		RegisterElement( &stattrak_m249 );
-
-		quality_m249.setup( XOR( "quality" ), XOR( "quality_m249" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_m249.SetCallback( callbacks::SkinUpdate );
-		quality_m249.AddShowCallback( callbacks::M249 );
-		RegisterElement( &quality_m249 );
-
-		seed_m249.setup( XOR( "seed" ), XOR( "seed_m249" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_m249.SetCallback( callbacks::SkinUpdate );
-		seed_m249.AddShowCallback( callbacks::M249 );
-		RegisterElement( &seed_m249 );
-
-		id_m4a4.setup( XOR( "paintkit id" ), XOR( "id_m4a4" ), 3 );
-		id_m4a4.SetCallback( callbacks::SkinUpdate );
-		id_m4a4.AddShowCallback( callbacks::M4A4 );
-		RegisterElement( &id_m4a4 );
-
-		stattrak_m4a4.setup( XOR( "stattrak" ), XOR( "stattrak_m4a4" ) );
-		stattrak_m4a4.SetCallback( callbacks::SkinUpdate );
-		stattrak_m4a4.AddShowCallback( callbacks::M4A4 );
-		RegisterElement( &stattrak_m4a4 );
-
-		quality_m4a4.setup( XOR( "quality" ), XOR( "quality_m4a4" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_m4a4.SetCallback( callbacks::SkinUpdate );
-		quality_m4a4.AddShowCallback( callbacks::M4A4 );
-		RegisterElement( &quality_m4a4 );
-
-		seed_m4a4.setup( XOR( "seed" ), XOR( "seed_m4a4" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_m4a4.SetCallback( callbacks::SkinUpdate );
-		seed_m4a4.AddShowCallback( callbacks::M4A4 );
-		RegisterElement( &seed_m4a4 );
-
-		id_mac10.setup( XOR( "paintkit id" ), XOR( "id_mac10" ), 3 );
-		id_mac10.SetCallback( callbacks::SkinUpdate );
-		id_mac10.AddShowCallback( callbacks::MAC10 );
-		RegisterElement( &id_mac10 );
-
-		stattrak_mac10.setup( XOR( "stattrak" ), XOR( "stattrak_mac10" ) );
-		stattrak_mac10.SetCallback( callbacks::SkinUpdate );
-		stattrak_mac10.AddShowCallback( callbacks::MAC10 );
-		RegisterElement( &stattrak_mac10 );
-
-		quality_mac10.setup( XOR( "quality" ), XOR( "quality_mac10" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_mac10.SetCallback( callbacks::SkinUpdate );
-		quality_mac10.AddShowCallback( callbacks::MAC10 );
-		RegisterElement( &quality_mac10 );
-
-		seed_mac10.setup( XOR( "seed" ), XOR( "seed_mac10" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_mac10.SetCallback( callbacks::SkinUpdate );
-		seed_mac10.AddShowCallback( callbacks::MAC10 );
-		RegisterElement( &seed_mac10 );
-
-		id_p90.setup( XOR( "paintkit id" ), XOR( "id_p90" ), 3 );
-		id_p90.SetCallback( callbacks::SkinUpdate );
-		id_p90.AddShowCallback( callbacks::P90 );
-		RegisterElement( &id_p90 );
-
-		stattrak_p90.setup( XOR( "stattrak" ), XOR( "stattrak_p90" ) );
-		stattrak_p90.SetCallback( callbacks::SkinUpdate );
-		stattrak_p90.AddShowCallback( callbacks::P90 );
-		RegisterElement( &stattrak_p90 );
-
-		quality_p90.setup( XOR( "quality" ), XOR( "quality_p90" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_p90.SetCallback( callbacks::SkinUpdate );
-		quality_p90.AddShowCallback( callbacks::P90 );
-		RegisterElement( &quality_p90 );
-
-		seed_p90.setup( XOR( "seed" ), XOR( "seed_p90" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_p90.SetCallback( callbacks::SkinUpdate );
-		seed_p90.AddShowCallback( callbacks::P90 );
-		RegisterElement( &seed_p90 );
-
-		id_ump45.setup( XOR( "paintkit id" ), XOR( "id_ump45" ), 3 );
-		id_ump45.SetCallback( callbacks::SkinUpdate );
-		id_ump45.AddShowCallback( callbacks::UMP45 );
-		RegisterElement( &id_ump45 );
-
-		stattrak_ump45.setup( XOR( "stattrak" ), XOR( "stattrak_ump45" ) );
-		stattrak_ump45.SetCallback( callbacks::SkinUpdate );
-		stattrak_ump45.AddShowCallback( callbacks::UMP45 );
-		RegisterElement( &stattrak_ump45 );
-
-		quality_ump45.setup( XOR( "quality" ), XOR( "quality_ump45" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_ump45.SetCallback( callbacks::SkinUpdate );
-		quality_ump45.AddShowCallback( callbacks::UMP45 );
-		RegisterElement( &quality_ump45 );
-
-		seed_ump45.setup( XOR( "seed" ), XOR( "seed_ump45" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_ump45.SetCallback( callbacks::SkinUpdate );
-		seed_ump45.AddShowCallback( callbacks::UMP45 );
-		RegisterElement( &seed_ump45 );
-
-		id_xm1014.setup( XOR( "paintkit id" ), XOR( "id_xm1014" ), 3 );
-		id_xm1014.SetCallback( callbacks::SkinUpdate );
-		id_xm1014.AddShowCallback( callbacks::XM1014 );
-		RegisterElement( &id_xm1014 );
-
-		stattrak_xm1014.setup( XOR( "stattrak" ), XOR( "stattrak_xm1014" ) );
-		stattrak_xm1014.SetCallback( callbacks::SkinUpdate );
-		stattrak_xm1014.AddShowCallback( callbacks::XM1014 );
-		RegisterElement( &stattrak_xm1014 );
-
-		quality_xm1014.setup( XOR( "quality" ), XOR( "quality_xm1014" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_xm1014.SetCallback( callbacks::SkinUpdate );
-		quality_xm1014.AddShowCallback( callbacks::XM1014 );
-		RegisterElement( &quality_xm1014 );
-
-		seed_xm1014.setup( XOR( "seed" ), XOR( "seed_xm1014" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_xm1014.SetCallback( callbacks::SkinUpdate );
-		seed_xm1014.AddShowCallback( callbacks::XM1014 );
-		RegisterElement( &seed_xm1014 );
-
-		id_bizon.setup( XOR( "paintkit id" ), XOR( "id_bizon" ), 3 );
-		id_bizon.SetCallback( callbacks::SkinUpdate );
-		id_bizon.AddShowCallback( callbacks::BIZON );
-		RegisterElement( &id_bizon );
-
-		stattrak_bizon.setup( XOR( "stattrak" ), XOR( "stattrak_bizon" ) );
-		stattrak_bizon.SetCallback( callbacks::SkinUpdate );
-		stattrak_bizon.AddShowCallback( callbacks::BIZON );
-		RegisterElement( &stattrak_bizon );
-
-		quality_bizon.setup( XOR( "quality" ), XOR( "quality_bizon" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_bizon.SetCallback( callbacks::SkinUpdate );
-		quality_bizon.AddShowCallback( callbacks::BIZON );
-		RegisterElement( &quality_bizon );
-
-		seed_bizon.setup( XOR( "seed" ), XOR( "seed_bizon" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_bizon.SetCallback( callbacks::SkinUpdate );
-		seed_bizon.AddShowCallback( callbacks::BIZON );
-		RegisterElement( &seed_bizon );
-
-		id_mag7.setup( XOR( "paintkit id" ), XOR( "id_mag7" ), 3 );
-		id_mag7.SetCallback( callbacks::SkinUpdate );
-		id_mag7.AddShowCallback( callbacks::MAG7 );
-		RegisterElement( &id_mag7 );
-
-		stattrak_mag7.setup( XOR( "stattrak" ), XOR( "stattrak_mag7" ) );
-		stattrak_mag7.SetCallback( callbacks::SkinUpdate );
-		stattrak_mag7.AddShowCallback( callbacks::MAG7 );
-		RegisterElement( &stattrak_mag7 );
-
-		quality_mag7.setup( XOR( "quality" ), XOR( "quality_mag7" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_mag7.SetCallback( callbacks::SkinUpdate );
-		quality_mag7.AddShowCallback( callbacks::MAG7 );
-		RegisterElement( &quality_mag7 );
-
-		seed_mag7.setup( XOR( "seed" ), XOR( "seed_mag7" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_mag7.SetCallback( callbacks::SkinUpdate );
-		seed_mag7.AddShowCallback( callbacks::MAG7 );
-		RegisterElement( &seed_mag7 );
-
-		id_negev.setup( XOR( "paintkit id" ), XOR( "id_negev" ), 3 );
-		id_negev.SetCallback( callbacks::SkinUpdate );
-		id_negev.AddShowCallback( callbacks::NEGEV );
-		RegisterElement( &id_negev );
-
-		stattrak_negev.setup( XOR( "stattrak" ), XOR( "stattrak_negev" ) );
-		stattrak_negev.SetCallback( callbacks::SkinUpdate );
-		stattrak_negev.AddShowCallback( callbacks::NEGEV );
-		RegisterElement( &stattrak_negev );
-
-		quality_negev.setup( XOR( "quality" ), XOR( "quality_negev" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_negev.SetCallback( callbacks::SkinUpdate );
-		quality_negev.AddShowCallback( callbacks::NEGEV );
-		RegisterElement( &quality_negev );
-
-		seed_negev.setup( XOR( "seed" ), XOR( "seed_negev" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_negev.SetCallback( callbacks::SkinUpdate );
-		seed_negev.AddShowCallback( callbacks::NEGEV );
-		RegisterElement( &seed_negev );
-
-		id_sawedoff.setup( XOR( "paintkit id" ), XOR( "id_sawedoff" ), 3 );
-		id_sawedoff.SetCallback( callbacks::SkinUpdate );
-		id_sawedoff.AddShowCallback( callbacks::SAWEDOFF );
-		RegisterElement( &id_sawedoff );
-
-		stattrak_sawedoff.setup( XOR( "stattrak" ), XOR( "stattrak_sawedoff" ) );
-		stattrak_sawedoff.SetCallback( callbacks::SkinUpdate );
-		stattrak_sawedoff.AddShowCallback( callbacks::SAWEDOFF );
-		RegisterElement( &stattrak_sawedoff );
-
-		quality_sawedoff.setup( XOR( "quality" ), XOR( "quality_sawedoff" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_sawedoff.SetCallback( callbacks::SkinUpdate );
-		quality_sawedoff.AddShowCallback( callbacks::SAWEDOFF );
-		RegisterElement( &quality_sawedoff );
-
-		seed_sawedoff.setup( XOR( "seed" ), XOR( "seed_sawedoff" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_sawedoff.SetCallback( callbacks::SkinUpdate );
-		seed_sawedoff.AddShowCallback( callbacks::SAWEDOFF );
-		RegisterElement( &seed_sawedoff );
-
-		id_tec9.setup( XOR( "paintkit id" ), XOR( "id_tec9" ), 3 );
-		id_tec9.SetCallback( callbacks::SkinUpdate );
-		id_tec9.AddShowCallback( callbacks::TEC9 );
-		RegisterElement( &id_tec9 );
-
-		stattrak_tec9.setup( XOR( "stattrak" ), XOR( "stattrak_tec9" ) );
-		stattrak_tec9.SetCallback( callbacks::SkinUpdate );
-		stattrak_tec9.AddShowCallback( callbacks::TEC9 );
-		RegisterElement( &stattrak_tec9 );
-
-		quality_tec9.setup( XOR( "quality" ), XOR( "quality_tec9" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_tec9.SetCallback( callbacks::SkinUpdate );
-		quality_tec9.AddShowCallback( callbacks::TEC9 );
-		RegisterElement( &quality_tec9 );
-
-		seed_tec9.setup( XOR( "seed" ), XOR( "seed_tec9" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_tec9.SetCallback( callbacks::SkinUpdate );
-		seed_tec9.AddShowCallback( callbacks::TEC9 );
-		RegisterElement( &seed_tec9 );
-
-		id_p2000.setup( XOR( "paintkit id" ), XOR( "id_p2000" ), 3 );
-		id_p2000.SetCallback( callbacks::SkinUpdate );
-		id_p2000.AddShowCallback( callbacks::P2000 );
-		RegisterElement( &id_p2000 );
-
-		stattrak_p2000.setup( XOR( "stattrak" ), XOR( "stattrak_p2000" ) );
-		stattrak_p2000.SetCallback( callbacks::SkinUpdate );
-		stattrak_p2000.AddShowCallback( callbacks::P2000 );
-		RegisterElement( &stattrak_p2000 );
-
-		quality_p2000.setup( XOR( "quality" ), XOR( "quality_p2000" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_p2000.SetCallback( callbacks::SkinUpdate );
-		quality_p2000.AddShowCallback( callbacks::P2000 );
-		RegisterElement( &quality_p2000 );
-
-		seed_p2000.setup( XOR( "seed" ), XOR( "seed_p2000" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_p2000.SetCallback( callbacks::SkinUpdate );
-		seed_p2000.AddShowCallback( callbacks::P2000 );
-		RegisterElement( &seed_p2000 );
-
-		id_mp7.setup( XOR( "paintkit id" ), XOR( "id_mp7" ), 3 );
-		id_mp7.SetCallback( callbacks::SkinUpdate );
-		id_mp7.AddShowCallback( callbacks::MP7 );
-		RegisterElement( &id_mp7 );
-
-		stattrak_mp7.setup( XOR( "stattrak" ), XOR( "stattrak_mp7" ) );
-		stattrak_mp7.SetCallback( callbacks::SkinUpdate );
-		stattrak_mp7.AddShowCallback( callbacks::MP7 );
-		RegisterElement( &stattrak_mp7 );
-
-		quality_mp7.setup( XOR( "quality" ), XOR( "quality_mp7" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_mp7.SetCallback( callbacks::SkinUpdate );
-		quality_mp7.AddShowCallback( callbacks::MP7 );
-		RegisterElement( &quality_mp7 );
-
-		seed_mp7.setup( XOR( "seed" ), XOR( "seed_mp7" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_mp7.SetCallback( callbacks::SkinUpdate );
-		seed_mp7.AddShowCallback( callbacks::MP7 );
-		RegisterElement( &seed_mp7 );
-
-		id_mp9.setup( XOR( "paintkit id" ), XOR( "id_mp9" ), 3 );
-		id_mp9.SetCallback( callbacks::SkinUpdate );
-		id_mp9.AddShowCallback( callbacks::MP9 );
-		RegisterElement( &id_mp9 );
-
-		stattrak_mp9.setup( XOR( "stattrak" ), XOR( "stattrak_mp9" ) );
-		stattrak_mp9.SetCallback( callbacks::SkinUpdate );
-		stattrak_mp9.AddShowCallback( callbacks::MP9 );
-		RegisterElement( &stattrak_mp9 );
-
-		quality_mp9.setup( XOR( "quality" ), XOR( "quality_mp9" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_mp9.SetCallback( callbacks::SkinUpdate );
-		quality_mp9.AddShowCallback( callbacks::MP9 );
-		RegisterElement( &quality_mp9 );
-
-		seed_mp9.setup( XOR( "seed" ), XOR( "seed_mp9" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_mp9.SetCallback( callbacks::SkinUpdate );
-		seed_mp9.AddShowCallback( callbacks::MP9 );
-		RegisterElement( &seed_mp9 );
-
-		id_nova.setup( XOR( "paintkit id" ), XOR( "id_nova" ), 3 );
-		id_nova.SetCallback( callbacks::SkinUpdate );
-		id_nova.AddShowCallback( callbacks::NOVA );
-		RegisterElement( &id_nova );
-
-		stattrak_nova.setup( XOR( "stattrak" ), XOR( "stattrak_nova" ) );
-		stattrak_nova.SetCallback( callbacks::SkinUpdate );
-		stattrak_nova.AddShowCallback( callbacks::NOVA );
-		RegisterElement( &stattrak_nova );
-
-		quality_nova.setup( XOR( "quality" ), XOR( "quality_nova" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_nova.SetCallback( callbacks::SkinUpdate );
-		quality_nova.AddShowCallback( callbacks::NOVA );
-		RegisterElement( &quality_nova );
-
-		seed_nova.setup( XOR( "seed" ), XOR( "seed_nova" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_nova.SetCallback( callbacks::SkinUpdate );
-		seed_nova.AddShowCallback( callbacks::NOVA );
-		RegisterElement( &seed_nova );
-
-		id_p250.setup( XOR( "paintkit id" ), XOR( "id_p250" ), 3 );
-		id_p250.SetCallback( callbacks::SkinUpdate );
-		id_p250.AddShowCallback( callbacks::P250 );
-		RegisterElement( &id_p250 );
-
-		stattrak_p250.setup( XOR( "stattrak" ), XOR( "stattrak_p250" ) );
-		stattrak_p250.SetCallback( callbacks::SkinUpdate );
-		stattrak_p250.AddShowCallback( callbacks::P250 );
-		RegisterElement( &stattrak_p250 );
-
-		quality_p250.setup( XOR( "quality" ), XOR( "quality_p250" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_p250.SetCallback( callbacks::SkinUpdate );
-		quality_p250.AddShowCallback( callbacks::P250 );
-		RegisterElement( &quality_p250 );
-
-		seed_p250.setup( XOR( "seed" ), XOR( "seed_p250" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_p250.SetCallback( callbacks::SkinUpdate );
-		seed_p250.AddShowCallback( callbacks::P250 );
-		RegisterElement( &seed_p250 );
-
-		id_scar20.setup( XOR( "paintkit id" ), XOR( "id_scar20" ), 3 );
-		id_scar20.SetCallback( callbacks::SkinUpdate );
-		id_scar20.AddShowCallback( callbacks::SCAR20 );
-		RegisterElement( &id_scar20 );
-
-		stattrak_scar20.setup( XOR( "stattrak" ), XOR( "stattrak_scar20" ) );
-		stattrak_scar20.SetCallback( callbacks::SkinUpdate );
-		stattrak_scar20.AddShowCallback( callbacks::SCAR20 );
-		RegisterElement( &stattrak_scar20 );
-
-		quality_scar20.setup( XOR( "quality" ), XOR( "quality_scar20" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_scar20.SetCallback( callbacks::SkinUpdate );
-		quality_scar20.AddShowCallback( callbacks::SCAR20 );
-		RegisterElement( &quality_scar20 );
-
-		seed_scar20.setup( XOR( "seed" ), XOR( "seed_scar20" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_scar20.SetCallback( callbacks::SkinUpdate );
-		seed_scar20.AddShowCallback( callbacks::SCAR20 );
-		RegisterElement( &seed_scar20 );
-
-		id_sg553.setup( XOR( "paintkit id" ), XOR( "id_sg553" ), 3 );
-		id_sg553.SetCallback( callbacks::SkinUpdate );
-		id_sg553.AddShowCallback( callbacks::SG553 );
-		RegisterElement( &id_sg553 );
-
-		stattrak_sg553.setup( XOR( "stattrak" ), XOR( "stattrak_sg553" ) );
-		stattrak_sg553.SetCallback( callbacks::SkinUpdate );
-		stattrak_sg553.AddShowCallback( callbacks::SG553 );
-		RegisterElement( &stattrak_sg553 );
-
-		quality_sg553.setup( XOR( "quality" ), XOR( "quality_sg553" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_sg553.SetCallback( callbacks::SkinUpdate );
-		quality_sg553.AddShowCallback( callbacks::SG553 );
-		RegisterElement( &quality_sg553 );
-
-		seed_sg553.setup( XOR( "seed" ), XOR( "seed_sg553" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_sg553.SetCallback( callbacks::SkinUpdate );
-		seed_sg553.AddShowCallback( callbacks::SG553 );
-		RegisterElement( &seed_sg553 );
-
-		id_ssg08.setup( XOR( "paintkit id" ), XOR( "id_ssg08" ), 3 );
-		id_ssg08.SetCallback( callbacks::SkinUpdate );
-		id_ssg08.AddShowCallback( callbacks::SSG08 );
-		RegisterElement( &id_ssg08 );
-
-		stattrak_ssg08.setup( XOR( "stattrak" ), XOR( "stattrak_ssg08" ) );
-		stattrak_ssg08.SetCallback( callbacks::SkinUpdate );
-		stattrak_ssg08.AddShowCallback( callbacks::SSG08 );
-		RegisterElement( &stattrak_ssg08 );
-
-		quality_ssg08.setup( XOR( "quality" ), XOR( "quality_ssg08" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_ssg08.SetCallback( callbacks::SkinUpdate );
-		quality_ssg08.AddShowCallback( callbacks::SSG08 );
-		RegisterElement( &quality_ssg08 );
-
-		seed_ssg08.setup( XOR( "seed" ), XOR( "seed_ssg08" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_ssg08.SetCallback( callbacks::SkinUpdate );
-		seed_ssg08.AddShowCallback( callbacks::SSG08 );
-		RegisterElement( &seed_ssg08 );
-
-		id_m4a1s.setup( XOR( "paintkit id" ), XOR( "id_m4a1s" ), 3 );
-		id_m4a1s.SetCallback( callbacks::SkinUpdate );
-		id_m4a1s.AddShowCallback( callbacks::M4A1S );
-		RegisterElement( &id_m4a1s );
-
-		stattrak_m4a1s.setup( XOR( "stattrak" ), XOR( "stattrak_m4a1s" ) );
-		stattrak_m4a1s.SetCallback( callbacks::SkinUpdate );
-		stattrak_m4a1s.AddShowCallback( callbacks::M4A1S );
-		RegisterElement( &stattrak_m4a1s );
-
-		quality_m4a1s.setup( XOR( "quality" ), XOR( "quality_m4a1s" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_m4a1s.SetCallback( callbacks::SkinUpdate );
-		quality_m4a1s.AddShowCallback( callbacks::M4A1S );
-		RegisterElement( &quality_m4a1s );
-
-		seed_m4a1s.setup( XOR( "seed" ), XOR( "seed_m4a1s" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_m4a1s.SetCallback( callbacks::SkinUpdate );
-		seed_m4a1s.AddShowCallback( callbacks::M4A1S );
-		RegisterElement( &seed_m4a1s );
-
-		id_usps.setup( XOR( "paintkit id" ), XOR( "id_usps" ), 3 );
-		id_usps.SetCallback( callbacks::SkinUpdate );
-		id_usps.AddShowCallback( callbacks::USPS );
-		RegisterElement( &id_usps );
-
-		stattrak_usps.setup( XOR( "stattrak" ), XOR( "stattrak_usps" ) );
-		stattrak_usps.SetCallback( callbacks::SkinUpdate );
-		stattrak_usps.AddShowCallback( callbacks::USPS );
-		RegisterElement( &stattrak_usps );
-
-		quality_usps.setup( XOR( "quality" ), XOR( "quality_usps" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_usps.SetCallback( callbacks::SkinUpdate );
-		quality_usps.AddShowCallback( callbacks::USPS );
-		RegisterElement( &quality_usps );
-
-		seed_usps.setup( XOR( "seed" ), XOR( "seed_usps" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_usps.SetCallback( callbacks::SkinUpdate );
-		seed_usps.AddShowCallback( callbacks::USPS );
-		RegisterElement( &seed_usps );
-
-		id_cz75a.setup( XOR( "paintkit id" ), XOR( "id_cz75a" ), 3 );
-		id_cz75a.SetCallback( callbacks::SkinUpdate );
-		id_cz75a.AddShowCallback( callbacks::CZ75A );
-		RegisterElement( &id_cz75a );
-
-		stattrak_cz75a.setup( XOR( "stattrak" ), XOR( "stattrak_cz75a" ) );
-		stattrak_cz75a.SetCallback( callbacks::SkinUpdate );
-		stattrak_cz75a.AddShowCallback( callbacks::CZ75A );
-		RegisterElement( &stattrak_cz75a );
-
-		quality_cz75a.setup( XOR( "quality" ), XOR( "quality_cz75a" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_cz75a.SetCallback( callbacks::SkinUpdate );
-		quality_cz75a.AddShowCallback( callbacks::CZ75A );
-		RegisterElement( &quality_cz75a );
-
-		seed_cz75a.setup( XOR( "seed" ), XOR( "seed_cz75a" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_cz75a.SetCallback( callbacks::SkinUpdate );
-		seed_cz75a.AddShowCallback( callbacks::CZ75A );
-		RegisterElement( &seed_cz75a );
-
-		id_revolver.setup( XOR( "paintkit id" ), XOR( "id_revolver" ), 3 );
-		id_revolver.SetCallback( callbacks::SkinUpdate );
-		id_revolver.AddShowCallback( callbacks::REVOLVER );
-		RegisterElement( &id_revolver );
-
-		stattrak_revolver.setup( XOR( "stattrak" ), XOR( "stattrak_revolver" ) );
-		stattrak_revolver.SetCallback( callbacks::SkinUpdate );
-		stattrak_revolver.AddShowCallback( callbacks::REVOLVER );
-		RegisterElement( &stattrak_revolver );
-
-		quality_revolver.setup( XOR( "quality" ), XOR( "quality_revolver" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_revolver.SetCallback( callbacks::SkinUpdate );
-		quality_revolver.AddShowCallback( callbacks::REVOLVER );
-		RegisterElement( &quality_revolver );
-
-		seed_revolver.setup( XOR( "seed" ), XOR( "seed_revolver" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_revolver.SetCallback( callbacks::SkinUpdate );
-		seed_revolver.AddShowCallback( callbacks::REVOLVER );
-		RegisterElement( &seed_revolver );
-
-		id_bayonet.setup( XOR( "paintkit id" ), XOR( "id_bayonet" ), 3 );
-		id_bayonet.SetCallback( callbacks::SkinUpdate );
-		id_bayonet.AddShowCallback( callbacks::KNIFE_BAYONET );
-		RegisterElement( &id_bayonet );
-
-		stattrak_bayonet.setup( XOR( "stattrak" ), XOR( "stattrak_bayonet" ) );
-		stattrak_bayonet.SetCallback( callbacks::SkinUpdate );
-		stattrak_bayonet.AddShowCallback( callbacks::KNIFE_BAYONET );
-		RegisterElement( &stattrak_bayonet );
-
-		quality_bayonet.setup( XOR( "quality" ), XOR( "quality_bayonet" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_bayonet.SetCallback( callbacks::SkinUpdate );
-		quality_bayonet.AddShowCallback( callbacks::KNIFE_BAYONET );
-		RegisterElement( &quality_bayonet );
-
-		seed_bayonet.setup( XOR( "seed" ), XOR( "seed_bayonet" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_bayonet.SetCallback( callbacks::SkinUpdate );
-		seed_bayonet.AddShowCallback( callbacks::KNIFE_BAYONET );
-		RegisterElement( &seed_bayonet );
-
-		id_flip.setup( XOR( "paintkit id" ), XOR( "id_flip" ), 3 );
-		id_flip.SetCallback( callbacks::SkinUpdate );
-		id_flip.AddShowCallback( callbacks::KNIFE_FLIP );
-		RegisterElement( &id_flip );
-
-		stattrak_flip.setup( XOR( "stattrak" ), XOR( "stattrak_flip" ) );
-		stattrak_flip.SetCallback( callbacks::SkinUpdate );
-		stattrak_flip.AddShowCallback( callbacks::KNIFE_FLIP );
-		RegisterElement( &stattrak_flip );
-
-		quality_flip.setup( XOR( "quality" ), XOR( "quality_flip" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_flip.SetCallback( callbacks::SkinUpdate );
-		quality_flip.AddShowCallback( callbacks::KNIFE_FLIP );
-		RegisterElement( &quality_flip );
-
-		seed_flip.setup( XOR( "seed" ), XOR( "seed_flip" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_flip.SetCallback( callbacks::SkinUpdate );
-		seed_flip.AddShowCallback( callbacks::KNIFE_FLIP );
-		RegisterElement( &seed_flip );
-
-		id_gut.setup( XOR( "paintkit id" ), XOR( "id_gut" ), 3 );
-		id_gut.SetCallback( callbacks::SkinUpdate );
-		id_gut.AddShowCallback( callbacks::KNIFE_GUT );
-		RegisterElement( &id_gut );
-
-		stattrak_gut.setup( XOR( "stattrak" ), XOR( "stattrak_gut" ) );
-		stattrak_gut.SetCallback( callbacks::SkinUpdate );
-		stattrak_gut.AddShowCallback( callbacks::KNIFE_GUT );
-		RegisterElement( &stattrak_gut );
-
-		quality_gut.setup( XOR( "quality" ), XOR( "quality_gut" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_gut.SetCallback( callbacks::SkinUpdate );
-		quality_gut.AddShowCallback( callbacks::KNIFE_GUT );
-		RegisterElement( &quality_gut );
-
-		seed_gut.setup( XOR( "seed" ), XOR( "seed_gut" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_gut.SetCallback( callbacks::SkinUpdate );
-		seed_gut.AddShowCallback( callbacks::KNIFE_GUT );
-		RegisterElement( &seed_gut );
-
-		id_karambit.setup( XOR( "paintkit id" ), XOR( "id_karambit" ), 3 );
-		id_karambit.SetCallback( callbacks::SkinUpdate );
-		id_karambit.AddShowCallback( callbacks::KNIFE_KARAMBIT );
-		RegisterElement( &id_karambit );
-
-		stattrak_karambit.setup( XOR( "stattrak" ), XOR( "stattrak_karambit" ) );
-		stattrak_karambit.SetCallback( callbacks::SkinUpdate );
-		stattrak_karambit.AddShowCallback( callbacks::KNIFE_KARAMBIT );
-		RegisterElement( &stattrak_karambit );
-
-		quality_karambit.setup( XOR( "quality" ), XOR( "quality_karambit" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_karambit.SetCallback( callbacks::SkinUpdate );
-		quality_karambit.AddShowCallback( callbacks::KNIFE_KARAMBIT );
-		RegisterElement( &quality_karambit );
-
-		seed_karambit.setup( XOR( "seed" ), XOR( "seed_karambit" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_karambit.SetCallback( callbacks::SkinUpdate );
-		seed_karambit.AddShowCallback( callbacks::KNIFE_KARAMBIT );
-		RegisterElement( &seed_karambit );
-
-		id_m9.setup( XOR( "paintkit id" ), XOR( "id_m9" ), 3 );
-		id_m9.SetCallback( callbacks::SkinUpdate );
-		id_m9.AddShowCallback( callbacks::KNIFE_M9_BAYONET );
-		RegisterElement( &id_m9 );
-
-		stattrak_m9.setup( XOR( "stattrak" ), XOR( "stattrak_m9" ) );
-		stattrak_m9.SetCallback( callbacks::SkinUpdate );
-		stattrak_m9.AddShowCallback( callbacks::KNIFE_M9_BAYONET );
-		RegisterElement( &stattrak_m9 );
-
-		quality_m9.setup( XOR( "quality" ), XOR( "quality_m9" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_m9.SetCallback( callbacks::SkinUpdate );
-		quality_m9.AddShowCallback( callbacks::KNIFE_M9_BAYONET );
-		RegisterElement( &quality_m9 );
-
-		seed_m9.setup( XOR( "seed" ), XOR( "seed_m9" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_m9.SetCallback( callbacks::SkinUpdate );
-		seed_m9.AddShowCallback( callbacks::KNIFE_M9_BAYONET );
-		RegisterElement( &seed_m9 );
-
-		id_huntsman.setup( XOR( "paintkit id" ), XOR( "id_huntsman" ), 3 );
-		id_huntsman.SetCallback( callbacks::SkinUpdate );
-		id_huntsman.AddShowCallback( callbacks::KNIFE_HUNTSMAN );
-		RegisterElement( &id_huntsman );
-
-		stattrak_huntsman.setup( XOR( "stattrak" ), XOR( "stattrak_huntsman" ) );
-		stattrak_huntsman.SetCallback( callbacks::SkinUpdate );
-		stattrak_huntsman.AddShowCallback( callbacks::KNIFE_HUNTSMAN );
-		RegisterElement( &stattrak_huntsman );
-
-		quality_huntsman.setup( XOR( "quality" ), XOR( "quality_huntsman" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_huntsman.SetCallback( callbacks::SkinUpdate );
-		quality_huntsman.AddShowCallback( callbacks::KNIFE_HUNTSMAN );
-		RegisterElement( &quality_huntsman );
-
-		seed_huntsman.setup( XOR( "seed" ), XOR( "seed_huntsman" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_huntsman.SetCallback( callbacks::SkinUpdate );
-		seed_huntsman.AddShowCallback( callbacks::KNIFE_HUNTSMAN );
-		RegisterElement( &seed_huntsman );
-
-		id_falchion.setup( XOR( "paintkit id" ), XOR( "id_falchion" ), 3 );
-		id_falchion.SetCallback( callbacks::SkinUpdate );
-		id_falchion.AddShowCallback( callbacks::KNIFE_FALCHION );
-		RegisterElement( &id_falchion );
-
-		stattrak_falchion.setup( XOR( "stattrak" ), XOR( "stattrak_falchion" ) );
-		stattrak_falchion.SetCallback( callbacks::SkinUpdate );
-		stattrak_falchion.AddShowCallback( callbacks::KNIFE_FALCHION );
-		RegisterElement( &stattrak_falchion );
-
-		quality_falchion.setup( XOR( "quality" ), XOR( "quality_falchion" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_falchion.SetCallback( callbacks::SkinUpdate );
-		quality_falchion.AddShowCallback( callbacks::KNIFE_FALCHION );
-		RegisterElement( &quality_falchion );
-
-		seed_falchion.setup( XOR( "seed" ), XOR( "seed_falchion" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_falchion.SetCallback( callbacks::SkinUpdate );
-		seed_falchion.AddShowCallback( callbacks::KNIFE_FALCHION );
-		RegisterElement( &seed_falchion );
-
-		id_bowie.setup( XOR( "paintkit id" ), XOR( "id_bowie" ), 3 );
-		id_bowie.SetCallback( callbacks::SkinUpdate );
-		id_bowie.AddShowCallback( callbacks::KNIFE_BOWIE );
-		RegisterElement( &id_bowie );
-
-		stattrak_bowie.setup( XOR( "stattrak" ), XOR( "stattrak_bowie" ) );
-		stattrak_bowie.SetCallback( callbacks::SkinUpdate );
-		stattrak_bowie.AddShowCallback( callbacks::KNIFE_BOWIE );
-		RegisterElement( &stattrak_bowie );
-
-		quality_bowie.setup( XOR( "quality" ), XOR( "quality_bowie" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_bowie.SetCallback( callbacks::SkinUpdate );
-		quality_bowie.AddShowCallback( callbacks::KNIFE_BOWIE );
-		RegisterElement( &quality_bowie );
-
-		seed_bowie.setup( XOR( "seed" ), XOR( "seed_bowie" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_bowie.SetCallback( callbacks::SkinUpdate );
-		seed_bowie.AddShowCallback( callbacks::KNIFE_BOWIE );
-		RegisterElement( &seed_bowie );
-
-		id_butterfly.setup( XOR( "paintkit id" ), XOR( "id_butterfly" ), 3 );
-		id_butterfly.SetCallback( callbacks::SkinUpdate );
-		id_butterfly.AddShowCallback( callbacks::KNIFE_BUTTERFLY );
-		RegisterElement( &id_butterfly );
-
-		stattrak_butterfly.setup( XOR( "stattrak" ), XOR( "stattrak_butterfly" ) );
-		stattrak_butterfly.SetCallback( callbacks::SkinUpdate );
-		stattrak_butterfly.AddShowCallback( callbacks::KNIFE_BUTTERFLY );
-		RegisterElement( &stattrak_butterfly );
-
-		quality_butterfly.setup( XOR( "quality" ), XOR( "quality_butterfly" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_butterfly.SetCallback( callbacks::SkinUpdate );
-		quality_butterfly.AddShowCallback( callbacks::KNIFE_BUTTERFLY );
-		RegisterElement( &quality_butterfly );
-
-		seed_butterfly.setup( XOR( "seed" ), XOR( "seed_butterfly" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_butterfly.SetCallback( callbacks::SkinUpdate );
-		seed_butterfly.AddShowCallback( callbacks::KNIFE_BUTTERFLY );
-		RegisterElement( &seed_butterfly );
-
-		id_daggers.setup( XOR( "paintkit id" ), XOR( "id_daggers" ), 3 );
-		id_daggers.SetCallback( callbacks::SkinUpdate );
-		id_daggers.AddShowCallback( callbacks::KNIFE_SHADOW_DAGGERS );
-		RegisterElement( &id_daggers );
-
-		stattrak_daggers.setup( XOR( "stattrak" ), XOR( "stattrak_daggers" ) );
-		stattrak_daggers.SetCallback( callbacks::SkinUpdate );
-		stattrak_daggers.AddShowCallback( callbacks::KNIFE_SHADOW_DAGGERS );
-		RegisterElement( &stattrak_daggers );
-
-		quality_daggers.setup( XOR( "quality" ), XOR( "quality_daggers" ), 1.f, 100.f, true, 0, 100.f, 1.f, XOR( L"%" ) );
-		quality_daggers.SetCallback( callbacks::SkinUpdate );
-		quality_daggers.AddShowCallback( callbacks::KNIFE_SHADOW_DAGGERS );
-		RegisterElement( &quality_daggers );
-
-		seed_daggers.setup( XOR( "seed" ), XOR( "seed_daggers" ), 0.f, 255.f, true, 0, 0.f, 1.f );
-		seed_daggers.SetCallback( callbacks::SkinUpdate );
-		seed_daggers.AddShowCallback( callbacks::KNIFE_SHADOW_DAGGERS );
-		RegisterElement( &seed_daggers );
+		id_deagle.setup(XOR("paintkit id"), XOR("id_deagle"), 3);
+		id_deagle.SetCallback(callbacks::SkinUpdate);
+		id_deagle.AddShowCallback(callbacks::DEAGLE);
+		RegisterElement(&id_deagle);
+
+		stattrak_deagle.setup(XOR("stattrak"), XOR("stattrak_deagle"));
+		stattrak_deagle.SetCallback(callbacks::SkinUpdate);
+		stattrak_deagle.AddShowCallback(callbacks::DEAGLE);
+		RegisterElement(&stattrak_deagle);
+
+		quality_deagle.setup(XOR("quality"), XOR("quality_deagle"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_deagle.SetCallback(callbacks::SkinUpdate);
+		quality_deagle.AddShowCallback(callbacks::DEAGLE);
+		RegisterElement(&quality_deagle);
+
+		seed_deagle.setup(XOR("seed"), XOR("seed_deagle"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_deagle.SetCallback(callbacks::SkinUpdate);
+		seed_deagle.AddShowCallback(callbacks::DEAGLE);
+		RegisterElement(&seed_deagle);
+
+		id_elite.setup(XOR("paintkit id"), XOR("id_elite"), 3);
+		id_elite.SetCallback(callbacks::SkinUpdate);
+		id_elite.AddShowCallback(callbacks::ELITE);
+		RegisterElement(&id_elite);
+
+		stattrak_elite.setup(XOR("stattrak"), XOR("stattrak_elite"));
+		stattrak_elite.SetCallback(callbacks::SkinUpdate);
+		stattrak_elite.AddShowCallback(callbacks::ELITE);
+		RegisterElement(&stattrak_elite);
+
+		quality_elite.setup(XOR("quality"), XOR("quality_elite"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_elite.SetCallback(callbacks::SkinUpdate);
+		quality_elite.AddShowCallback(callbacks::ELITE);
+		RegisterElement(&quality_elite);
+
+		seed_elite.setup(XOR("seed"), XOR("seed_elite"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_elite.SetCallback(callbacks::SkinUpdate);
+		seed_elite.AddShowCallback(callbacks::ELITE);
+		RegisterElement(&seed_elite);
+
+		id_fiveseven.setup(XOR("paintkit id"), XOR("id_fiveseven"), 3);
+		id_fiveseven.SetCallback(callbacks::SkinUpdate);
+		id_fiveseven.AddShowCallback(callbacks::FIVESEVEN);
+		RegisterElement(&id_fiveseven);
+
+		stattrak_fiveseven.setup(XOR("stattrak"), XOR("stattrak_fiveseven"));
+		stattrak_fiveseven.SetCallback(callbacks::SkinUpdate);
+		stattrak_fiveseven.AddShowCallback(callbacks::FIVESEVEN);
+		RegisterElement(&stattrak_fiveseven);
+
+		quality_fiveseven.setup(XOR("quality"), XOR("quality_fiveseven"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_fiveseven.SetCallback(callbacks::SkinUpdate);
+		quality_fiveseven.AddShowCallback(callbacks::FIVESEVEN);
+		RegisterElement(&quality_fiveseven);
+
+		seed_fiveseven.setup(XOR("seed"), XOR("seed_fiveseven"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_fiveseven.SetCallback(callbacks::SkinUpdate);
+		seed_fiveseven.AddShowCallback(callbacks::FIVESEVEN);
+		RegisterElement(&seed_fiveseven);
+
+		id_glock.setup(XOR("paintkit id"), XOR("id_glock"), 3);
+		id_glock.SetCallback(callbacks::SkinUpdate);
+		id_glock.AddShowCallback(callbacks::GLOCK);
+		RegisterElement(&id_glock);
+
+		stattrak_glock.setup(XOR("stattrak"), XOR("stattrak_glock"));
+		stattrak_glock.SetCallback(callbacks::SkinUpdate);
+		stattrak_glock.AddShowCallback(callbacks::GLOCK);
+		RegisterElement(&stattrak_glock);
+
+		quality_glock.setup(XOR("quality"), XOR("quality_glock"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_glock.SetCallback(callbacks::SkinUpdate);
+		quality_glock.AddShowCallback(callbacks::GLOCK);
+		RegisterElement(&quality_glock);
+
+		seed_glock.setup(XOR("seed"), XOR("seed_glock"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_glock.SetCallback(callbacks::SkinUpdate);
+		seed_glock.AddShowCallback(callbacks::GLOCK);
+		RegisterElement(&seed_glock);
+
+		id_ak47.setup(XOR("paintkit id"), XOR("id_ak47"), 3);
+		id_ak47.SetCallback(callbacks::SkinUpdate);
+		id_ak47.AddShowCallback(callbacks::AK47);
+		RegisterElement(&id_ak47);
+
+		stattrak_ak47.setup(XOR("stattrak"), XOR("stattrak_ak47"));
+		stattrak_ak47.SetCallback(callbacks::SkinUpdate);
+		stattrak_ak47.AddShowCallback(callbacks::AK47);
+		RegisterElement(&stattrak_ak47);
+
+		quality_ak47.setup(XOR("quality"), XOR("quality_ak47"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_ak47.SetCallback(callbacks::SkinUpdate);
+		quality_ak47.AddShowCallback(callbacks::AK47);
+		RegisterElement(&quality_ak47);
+
+		seed_ak47.setup(XOR("seed"), XOR("seed_ak47"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_ak47.SetCallback(callbacks::SkinUpdate);
+		seed_ak47.AddShowCallback(callbacks::AK47);
+		RegisterElement(&seed_ak47);
+
+		id_aug.setup(XOR("paintkit id"), XOR("id_aug"), 3);
+		id_aug.SetCallback(callbacks::SkinUpdate);
+		id_aug.AddShowCallback(callbacks::AUG);
+		RegisterElement(&id_aug);
+
+		stattrak_aug.setup(XOR("stattrak"), XOR("stattrak_aug"));
+		stattrak_aug.SetCallback(callbacks::SkinUpdate);
+		stattrak_aug.AddShowCallback(callbacks::AUG);
+		RegisterElement(&stattrak_aug);
+
+		quality_aug.setup(XOR("quality"), XOR("quality_aug"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_aug.SetCallback(callbacks::SkinUpdate);
+		quality_aug.AddShowCallback(callbacks::AUG);
+		RegisterElement(&quality_aug);
+
+		seed_aug.setup(XOR("seed"), XOR("seed_aug"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_aug.SetCallback(callbacks::SkinUpdate);
+		seed_aug.AddShowCallback(callbacks::AUG);
+		RegisterElement(&seed_aug);
+
+		id_awp.setup(XOR("paintkit id"), XOR("id_awp"), 3);
+		id_awp.SetCallback(callbacks::SkinUpdate);
+		id_awp.AddShowCallback(callbacks::AWP);
+		RegisterElement(&id_awp);
+
+		stattrak_awp.setup(XOR("stattrak"), XOR("stattrak_awp"));
+		stattrak_awp.SetCallback(callbacks::SkinUpdate);
+		stattrak_awp.AddShowCallback(callbacks::AWP);
+		RegisterElement(&stattrak_awp);
+
+		quality_awp.setup(XOR("quality"), XOR("quality_awp"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_awp.SetCallback(callbacks::SkinUpdate);
+		quality_awp.AddShowCallback(callbacks::AWP);
+		RegisterElement(&quality_awp);
+
+		seed_awp.setup(XOR("seed"), XOR("seed_awp"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_awp.SetCallback(callbacks::SkinUpdate);
+		seed_awp.AddShowCallback(callbacks::AWP);
+		RegisterElement(&seed_awp);
+
+		awp_color.setup(XOR("color"), XOR("awp_color"), colors::white);
+		awp_color.SetCallback(callbacks::SkinUpdate);
+		awp_color.AddShowCallback(callbacks::AWP);
+		RegisterElement(&awp_color);
+
+		awp_color1.setup(XOR("color 1"), XOR("awp_color1"), colors::white);
+		awp_color1.SetCallback(callbacks::SkinUpdate);
+		awp_color1.AddShowCallback(callbacks::AWP);
+		RegisterElement(&awp_color1);
+
+		awp_color2.setup(XOR("color 2"), XOR("awp_color2"), colors::white);
+		awp_color2.SetCallback(callbacks::SkinUpdate);
+		awp_color2.AddShowCallback(callbacks::AWP);
+		RegisterElement(&awp_color2);
+
+		awp_color3.setup(XOR("color 3"), XOR("awp_color3"), colors::white);
+		awp_color3.SetCallback(callbacks::SkinUpdate);
+		awp_color3.AddShowCallback(callbacks::AWP);
+		RegisterElement(&awp_color3);
+
+		id_famas.setup(XOR("paintkit id"), XOR("id_famas"), 3);
+		id_famas.SetCallback(callbacks::SkinUpdate);
+		id_famas.AddShowCallback(callbacks::FAMAS);
+		RegisterElement(&id_famas);
+
+		stattrak_famas.setup(XOR("stattrak"), XOR("stattrak_famas"));
+		stattrak_famas.SetCallback(callbacks::SkinUpdate);
+		stattrak_famas.AddShowCallback(callbacks::FAMAS);
+		RegisterElement(&stattrak_famas);
+
+		quality_famas.setup(XOR("quality"), XOR("quality_famas"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_famas.SetCallback(callbacks::SkinUpdate);
+		quality_famas.AddShowCallback(callbacks::FAMAS);
+		RegisterElement(&quality_famas);
+
+		seed_famas.setup(XOR("seed"), XOR("seed_famas"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_famas.SetCallback(callbacks::SkinUpdate);
+		seed_famas.AddShowCallback(callbacks::FAMAS);
+		RegisterElement(&seed_famas);
+
+		id_g3sg1.setup(XOR("paintkit id"), XOR("id_g3sg1"), 3);
+		id_g3sg1.SetCallback(callbacks::SkinUpdate);
+		id_g3sg1.AddShowCallback(callbacks::G3SG1);
+		RegisterElement(&id_g3sg1);
+
+		stattrak_g3sg1.setup(XOR("stattrak"), XOR("stattrak_g3sg1"));
+		stattrak_g3sg1.SetCallback(callbacks::SkinUpdate);
+		stattrak_g3sg1.AddShowCallback(callbacks::G3SG1);
+		RegisterElement(&stattrak_g3sg1);
+
+		quality_g3sg1.setup(XOR("quality"), XOR("quality_g3sg1"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_g3sg1.SetCallback(callbacks::SkinUpdate);
+		quality_g3sg1.AddShowCallback(callbacks::G3SG1);
+		RegisterElement(&quality_g3sg1);
+
+		seed_g3sg1.setup(XOR("seed"), XOR("seed_g3sg1"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_g3sg1.SetCallback(callbacks::SkinUpdate);
+		seed_g3sg1.AddShowCallback(callbacks::G3SG1);
+		RegisterElement(&seed_g3sg1);
+
+		g3sg1_color.setup(XOR("color"), XOR("g3sg1_color"), colors::white);
+		g3sg1_color.SetCallback(callbacks::SkinUpdate);
+		g3sg1_color.AddShowCallback(callbacks::G3SG1);
+		RegisterElement(&g3sg1_color);
+
+		g3sg1_color1.setup(XOR("color 1"), XOR("g3sg1_color1"), colors::white);
+		g3sg1_color1.SetCallback(callbacks::SkinUpdate);
+		g3sg1_color1.AddShowCallback(callbacks::G3SG1);
+		RegisterElement(&g3sg1_color1);
+
+		g3sg1_color2.setup(XOR("color 2"), XOR("g3sg1_color2"), colors::white);
+		g3sg1_color2.SetCallback(callbacks::SkinUpdate);
+		g3sg1_color2.AddShowCallback(callbacks::G3SG1);
+		RegisterElement(&g3sg1_color2);
+
+		g3sg1_color3.setup(XOR("color 3"), XOR("g3sg1_color3"), colors::white);
+		g3sg1_color3.SetCallback(callbacks::SkinUpdate);
+		g3sg1_color3.AddShowCallback(callbacks::G3SG1);
+		RegisterElement(&g3sg1_color3);
+
+		id_galil.setup(XOR("paintkit id"), XOR("id_galil"), 3);
+		id_galil.SetCallback(callbacks::SkinUpdate);
+		id_galil.AddShowCallback(callbacks::GALIL);
+		RegisterElement(&id_galil);
+
+		stattrak_galil.setup(XOR("stattrak"), XOR("stattrak_galil"));
+		stattrak_galil.SetCallback(callbacks::SkinUpdate);
+		stattrak_galil.AddShowCallback(callbacks::GALIL);
+		RegisterElement(&stattrak_galil);
+
+		quality_galil.setup(XOR("quality"), XOR("quality_galil"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_galil.SetCallback(callbacks::SkinUpdate);
+		quality_galil.AddShowCallback(callbacks::GALIL);
+		RegisterElement(&quality_galil);
+
+		seed_galil.setup(XOR("seed"), XOR("seed_galil"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_galil.SetCallback(callbacks::SkinUpdate);
+		seed_galil.AddShowCallback(callbacks::GALIL);
+		RegisterElement(&seed_galil);
+
+		id_m249.setup(XOR("paintkit id"), XOR("id_m249"), 3);
+		id_m249.SetCallback(callbacks::SkinUpdate);
+		id_m249.AddShowCallback(callbacks::M249);
+		RegisterElement(&id_m249);
+
+		stattrak_m249.setup(XOR("stattrak"), XOR("stattrak_m249"));
+		stattrak_m249.SetCallback(callbacks::SkinUpdate);
+		stattrak_m249.AddShowCallback(callbacks::M249);
+		RegisterElement(&stattrak_m249);
+
+		quality_m249.setup(XOR("quality"), XOR("quality_m249"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_m249.SetCallback(callbacks::SkinUpdate);
+		quality_m249.AddShowCallback(callbacks::M249);
+		RegisterElement(&quality_m249);
+
+		seed_m249.setup(XOR("seed"), XOR("seed_m249"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_m249.SetCallback(callbacks::SkinUpdate);
+		seed_m249.AddShowCallback(callbacks::M249);
+		RegisterElement(&seed_m249);
+
+		id_m4a4.setup(XOR("paintkit id"), XOR("id_m4a4"), 3);
+		id_m4a4.SetCallback(callbacks::SkinUpdate);
+		id_m4a4.AddShowCallback(callbacks::M4A4);
+		RegisterElement(&id_m4a4);
+
+		stattrak_m4a4.setup(XOR("stattrak"), XOR("stattrak_m4a4"));
+		stattrak_m4a4.SetCallback(callbacks::SkinUpdate);
+		stattrak_m4a4.AddShowCallback(callbacks::M4A4);
+		RegisterElement(&stattrak_m4a4);
+
+		quality_m4a4.setup(XOR("quality"), XOR("quality_m4a4"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_m4a4.SetCallback(callbacks::SkinUpdate);
+		quality_m4a4.AddShowCallback(callbacks::M4A4);
+		RegisterElement(&quality_m4a4);
+
+		seed_m4a4.setup(XOR("seed"), XOR("seed_m4a4"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_m4a4.SetCallback(callbacks::SkinUpdate);
+		seed_m4a4.AddShowCallback(callbacks::M4A4);
+		RegisterElement(&seed_m4a4);
+
+		id_mac10.setup(XOR("paintkit id"), XOR("id_mac10"), 3);
+		id_mac10.SetCallback(callbacks::SkinUpdate);
+		id_mac10.AddShowCallback(callbacks::MAC10);
+		RegisterElement(&id_mac10);
+
+		stattrak_mac10.setup(XOR("stattrak"), XOR("stattrak_mac10"));
+		stattrak_mac10.SetCallback(callbacks::SkinUpdate);
+		stattrak_mac10.AddShowCallback(callbacks::MAC10);
+		RegisterElement(&stattrak_mac10);
+
+		quality_mac10.setup(XOR("quality"), XOR("quality_mac10"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_mac10.SetCallback(callbacks::SkinUpdate);
+		quality_mac10.AddShowCallback(callbacks::MAC10);
+		RegisterElement(&quality_mac10);
+
+		seed_mac10.setup(XOR("seed"), XOR("seed_mac10"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_mac10.SetCallback(callbacks::SkinUpdate);
+		seed_mac10.AddShowCallback(callbacks::MAC10);
+		RegisterElement(&seed_mac10);
+
+		id_p90.setup(XOR("paintkit id"), XOR("id_p90"), 3);
+		id_p90.SetCallback(callbacks::SkinUpdate);
+		id_p90.AddShowCallback(callbacks::P90);
+		RegisterElement(&id_p90);
+
+		stattrak_p90.setup(XOR("stattrak"), XOR("stattrak_p90"));
+		stattrak_p90.SetCallback(callbacks::SkinUpdate);
+		stattrak_p90.AddShowCallback(callbacks::P90);
+		RegisterElement(&stattrak_p90);
+
+		quality_p90.setup(XOR("quality"), XOR("quality_p90"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_p90.SetCallback(callbacks::SkinUpdate);
+		quality_p90.AddShowCallback(callbacks::P90);
+		RegisterElement(&quality_p90);
+
+		seed_p90.setup(XOR("seed"), XOR("seed_p90"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_p90.SetCallback(callbacks::SkinUpdate);
+		seed_p90.AddShowCallback(callbacks::P90);
+		RegisterElement(&seed_p90);
+
+		id_ump45.setup(XOR("paintkit id"), XOR("id_ump45"), 3);
+		id_ump45.SetCallback(callbacks::SkinUpdate);
+		id_ump45.AddShowCallback(callbacks::UMP45);
+		RegisterElement(&id_ump45);
+
+		stattrak_ump45.setup(XOR("stattrak"), XOR("stattrak_ump45"));
+		stattrak_ump45.SetCallback(callbacks::SkinUpdate);
+		stattrak_ump45.AddShowCallback(callbacks::UMP45);
+		RegisterElement(&stattrak_ump45);
+
+		quality_ump45.setup(XOR("quality"), XOR("quality_ump45"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_ump45.SetCallback(callbacks::SkinUpdate);
+		quality_ump45.AddShowCallback(callbacks::UMP45);
+		RegisterElement(&quality_ump45);
+
+		seed_ump45.setup(XOR("seed"), XOR("seed_ump45"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_ump45.SetCallback(callbacks::SkinUpdate);
+		seed_ump45.AddShowCallback(callbacks::UMP45);
+		RegisterElement(&seed_ump45);
+
+		id_xm1014.setup(XOR("paintkit id"), XOR("id_xm1014"), 3);
+		id_xm1014.SetCallback(callbacks::SkinUpdate);
+		id_xm1014.AddShowCallback(callbacks::XM1014);
+		RegisterElement(&id_xm1014);
+
+		stattrak_xm1014.setup(XOR("stattrak"), XOR("stattrak_xm1014"));
+		stattrak_xm1014.SetCallback(callbacks::SkinUpdate);
+		stattrak_xm1014.AddShowCallback(callbacks::XM1014);
+		RegisterElement(&stattrak_xm1014);
+
+		quality_xm1014.setup(XOR("quality"), XOR("quality_xm1014"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_xm1014.SetCallback(callbacks::SkinUpdate);
+		quality_xm1014.AddShowCallback(callbacks::XM1014);
+		RegisterElement(&quality_xm1014);
+
+		seed_xm1014.setup(XOR("seed"), XOR("seed_xm1014"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_xm1014.SetCallback(callbacks::SkinUpdate);
+		seed_xm1014.AddShowCallback(callbacks::XM1014);
+		RegisterElement(&seed_xm1014);
+
+		id_bizon.setup(XOR("paintkit id"), XOR("id_bizon"), 3);
+		id_bizon.SetCallback(callbacks::SkinUpdate);
+		id_bizon.AddShowCallback(callbacks::BIZON);
+		RegisterElement(&id_bizon);
+
+		stattrak_bizon.setup(XOR("stattrak"), XOR("stattrak_bizon"));
+		stattrak_bizon.SetCallback(callbacks::SkinUpdate);
+		stattrak_bizon.AddShowCallback(callbacks::BIZON);
+		RegisterElement(&stattrak_bizon);
+
+		quality_bizon.setup(XOR("quality"), XOR("quality_bizon"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_bizon.SetCallback(callbacks::SkinUpdate);
+		quality_bizon.AddShowCallback(callbacks::BIZON);
+		RegisterElement(&quality_bizon);
+
+		seed_bizon.setup(XOR("seed"), XOR("seed_bizon"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_bizon.SetCallback(callbacks::SkinUpdate);
+		seed_bizon.AddShowCallback(callbacks::BIZON);
+		RegisterElement(&seed_bizon);
+
+		id_mag7.setup(XOR("paintkit id"), XOR("id_mag7"), 3);
+		id_mag7.SetCallback(callbacks::SkinUpdate);
+		id_mag7.AddShowCallback(callbacks::MAG7);
+		RegisterElement(&id_mag7);
+
+		stattrak_mag7.setup(XOR("stattrak"), XOR("stattrak_mag7"));
+		stattrak_mag7.SetCallback(callbacks::SkinUpdate);
+		stattrak_mag7.AddShowCallback(callbacks::MAG7);
+		RegisterElement(&stattrak_mag7);
+
+		quality_mag7.setup(XOR("quality"), XOR("quality_mag7"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_mag7.SetCallback(callbacks::SkinUpdate);
+		quality_mag7.AddShowCallback(callbacks::MAG7);
+		RegisterElement(&quality_mag7);
+
+		seed_mag7.setup(XOR("seed"), XOR("seed_mag7"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_mag7.SetCallback(callbacks::SkinUpdate);
+		seed_mag7.AddShowCallback(callbacks::MAG7);
+		RegisterElement(&seed_mag7);
+
+		id_negev.setup(XOR("paintkit id"), XOR("id_negev"), 3);
+		id_negev.SetCallback(callbacks::SkinUpdate);
+		id_negev.AddShowCallback(callbacks::NEGEV);
+		RegisterElement(&id_negev);
+
+		stattrak_negev.setup(XOR("stattrak"), XOR("stattrak_negev"));
+		stattrak_negev.SetCallback(callbacks::SkinUpdate);
+		stattrak_negev.AddShowCallback(callbacks::NEGEV);
+		RegisterElement(&stattrak_negev);
+
+		quality_negev.setup(XOR("quality"), XOR("quality_negev"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_negev.SetCallback(callbacks::SkinUpdate);
+		quality_negev.AddShowCallback(callbacks::NEGEV);
+		RegisterElement(&quality_negev);
+
+		seed_negev.setup(XOR("seed"), XOR("seed_negev"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_negev.SetCallback(callbacks::SkinUpdate);
+		seed_negev.AddShowCallback(callbacks::NEGEV);
+		RegisterElement(&seed_negev);
+
+		id_sawedoff.setup(XOR("paintkit id"), XOR("id_sawedoff"), 3);
+		id_sawedoff.SetCallback(callbacks::SkinUpdate);
+		id_sawedoff.AddShowCallback(callbacks::SAWEDOFF);
+		RegisterElement(&id_sawedoff);
+
+		stattrak_sawedoff.setup(XOR("stattrak"), XOR("stattrak_sawedoff"));
+		stattrak_sawedoff.SetCallback(callbacks::SkinUpdate);
+		stattrak_sawedoff.AddShowCallback(callbacks::SAWEDOFF);
+		RegisterElement(&stattrak_sawedoff);
+
+		quality_sawedoff.setup(XOR("quality"), XOR("quality_sawedoff"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_sawedoff.SetCallback(callbacks::SkinUpdate);
+		quality_sawedoff.AddShowCallback(callbacks::SAWEDOFF);
+		RegisterElement(&quality_sawedoff);
+
+		seed_sawedoff.setup(XOR("seed"), XOR("seed_sawedoff"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_sawedoff.SetCallback(callbacks::SkinUpdate);
+		seed_sawedoff.AddShowCallback(callbacks::SAWEDOFF);
+		RegisterElement(&seed_sawedoff);
+
+		id_tec9.setup(XOR("paintkit id"), XOR("id_tec9"), 3);
+		id_tec9.SetCallback(callbacks::SkinUpdate);
+		id_tec9.AddShowCallback(callbacks::TEC9);
+		RegisterElement(&id_tec9);
+
+		stattrak_tec9.setup(XOR("stattrak"), XOR("stattrak_tec9"));
+		stattrak_tec9.SetCallback(callbacks::SkinUpdate);
+		stattrak_tec9.AddShowCallback(callbacks::TEC9);
+		RegisterElement(&stattrak_tec9);
+
+		quality_tec9.setup(XOR("quality"), XOR("quality_tec9"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_tec9.SetCallback(callbacks::SkinUpdate);
+		quality_tec9.AddShowCallback(callbacks::TEC9);
+		RegisterElement(&quality_tec9);
+
+		seed_tec9.setup(XOR("seed"), XOR("seed_tec9"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_tec9.SetCallback(callbacks::SkinUpdate);
+		seed_tec9.AddShowCallback(callbacks::TEC9);
+		RegisterElement(&seed_tec9);
+
+		id_p2000.setup(XOR("paintkit id"), XOR("id_p2000"), 3);
+		id_p2000.SetCallback(callbacks::SkinUpdate);
+		id_p2000.AddShowCallback(callbacks::P2000);
+		RegisterElement(&id_p2000);
+
+		stattrak_p2000.setup(XOR("stattrak"), XOR("stattrak_p2000"));
+		stattrak_p2000.SetCallback(callbacks::SkinUpdate);
+		stattrak_p2000.AddShowCallback(callbacks::P2000);
+		RegisterElement(&stattrak_p2000);
+
+		quality_p2000.setup(XOR("quality"), XOR("quality_p2000"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_p2000.SetCallback(callbacks::SkinUpdate);
+		quality_p2000.AddShowCallback(callbacks::P2000);
+		RegisterElement(&quality_p2000);
+
+		seed_p2000.setup(XOR("seed"), XOR("seed_p2000"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_p2000.SetCallback(callbacks::SkinUpdate);
+		seed_p2000.AddShowCallback(callbacks::P2000);
+		RegisterElement(&seed_p2000);
+
+		id_mp7.setup(XOR("paintkit id"), XOR("id_mp7"), 3);
+		id_mp7.SetCallback(callbacks::SkinUpdate);
+		id_mp7.AddShowCallback(callbacks::MP7);
+		RegisterElement(&id_mp7);
+
+		stattrak_mp7.setup(XOR("stattrak"), XOR("stattrak_mp7"));
+		stattrak_mp7.SetCallback(callbacks::SkinUpdate);
+		stattrak_mp7.AddShowCallback(callbacks::MP7);
+		RegisterElement(&stattrak_mp7);
+
+		quality_mp7.setup(XOR("quality"), XOR("quality_mp7"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_mp7.SetCallback(callbacks::SkinUpdate);
+		quality_mp7.AddShowCallback(callbacks::MP7);
+		RegisterElement(&quality_mp7);
+
+		seed_mp7.setup(XOR("seed"), XOR("seed_mp7"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_mp7.SetCallback(callbacks::SkinUpdate);
+		seed_mp7.AddShowCallback(callbacks::MP7);
+		RegisterElement(&seed_mp7);
+
+		id_mp9.setup(XOR("paintkit id"), XOR("id_mp9"), 3);
+		id_mp9.SetCallback(callbacks::SkinUpdate);
+		id_mp9.AddShowCallback(callbacks::MP9);
+		RegisterElement(&id_mp9);
+
+		stattrak_mp9.setup(XOR("stattrak"), XOR("stattrak_mp9"));
+		stattrak_mp9.SetCallback(callbacks::SkinUpdate);
+		stattrak_mp9.AddShowCallback(callbacks::MP9);
+		RegisterElement(&stattrak_mp9);
+
+		quality_mp9.setup(XOR("quality"), XOR("quality_mp9"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_mp9.SetCallback(callbacks::SkinUpdate);
+		quality_mp9.AddShowCallback(callbacks::MP9);
+		RegisterElement(&quality_mp9);
+
+		seed_mp9.setup(XOR("seed"), XOR("seed_mp9"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_mp9.SetCallback(callbacks::SkinUpdate);
+		seed_mp9.AddShowCallback(callbacks::MP9);
+		RegisterElement(&seed_mp9);
+
+		id_nova.setup(XOR("paintkit id"), XOR("id_nova"), 3);
+		id_nova.SetCallback(callbacks::SkinUpdate);
+		id_nova.AddShowCallback(callbacks::NOVA);
+		RegisterElement(&id_nova);
+
+		stattrak_nova.setup(XOR("stattrak"), XOR("stattrak_nova"));
+		stattrak_nova.SetCallback(callbacks::SkinUpdate);
+		stattrak_nova.AddShowCallback(callbacks::NOVA);
+		RegisterElement(&stattrak_nova);
+
+		quality_nova.setup(XOR("quality"), XOR("quality_nova"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_nova.SetCallback(callbacks::SkinUpdate);
+		quality_nova.AddShowCallback(callbacks::NOVA);
+		RegisterElement(&quality_nova);
+
+		seed_nova.setup(XOR("seed"), XOR("seed_nova"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_nova.SetCallback(callbacks::SkinUpdate);
+		seed_nova.AddShowCallback(callbacks::NOVA);
+		RegisterElement(&seed_nova);
+
+		id_p250.setup(XOR("paintkit id"), XOR("id_p250"), 3);
+		id_p250.SetCallback(callbacks::SkinUpdate);
+		id_p250.AddShowCallback(callbacks::P250);
+		RegisterElement(&id_p250);
+
+		stattrak_p250.setup(XOR("stattrak"), XOR("stattrak_p250"));
+		stattrak_p250.SetCallback(callbacks::SkinUpdate);
+		stattrak_p250.AddShowCallback(callbacks::P250);
+		RegisterElement(&stattrak_p250);
+
+		quality_p250.setup(XOR("quality"), XOR("quality_p250"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_p250.SetCallback(callbacks::SkinUpdate);
+		quality_p250.AddShowCallback(callbacks::P250);
+		RegisterElement(&quality_p250);
+
+		seed_p250.setup(XOR("seed"), XOR("seed_p250"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_p250.SetCallback(callbacks::SkinUpdate);
+		seed_p250.AddShowCallback(callbacks::P250);
+		RegisterElement(&seed_p250);
+
+		id_scar20.setup(XOR("paintkit id"), XOR("id_scar20"), 3);
+		id_scar20.SetCallback(callbacks::SkinUpdate);
+		id_scar20.AddShowCallback(callbacks::SCAR20);
+		RegisterElement(&id_scar20);
+
+		stattrak_scar20.setup(XOR("stattrak"), XOR("stattrak_scar20"));
+		stattrak_scar20.SetCallback(callbacks::SkinUpdate);
+		stattrak_scar20.AddShowCallback(callbacks::SCAR20);
+		RegisterElement(&stattrak_scar20);
+
+		quality_scar20.setup(XOR("quality"), XOR("quality_scar20"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_scar20.SetCallback(callbacks::SkinUpdate);
+		quality_scar20.AddShowCallback(callbacks::SCAR20);
+		RegisterElement(&quality_scar20);
+
+		seed_scar20.setup(XOR("seed"), XOR("seed_scar20"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_scar20.SetCallback(callbacks::SkinUpdate);
+		seed_scar20.AddShowCallback(callbacks::SCAR20);
+		RegisterElement(&seed_scar20);
+
+		scar20_color.setup(XOR("color"), XOR("scar20_color"), colors::white);
+		scar20_color.SetCallback(callbacks::SkinUpdate);
+		scar20_color.AddShowCallback(callbacks::SCAR20);
+		RegisterElement(&scar20_color);
+
+		scar20_color1.setup(XOR("color 1"), XOR("scar20_color1"), colors::white);
+		scar20_color1.SetCallback(callbacks::SkinUpdate);
+		scar20_color1.AddShowCallback(callbacks::SCAR20);
+		RegisterElement(&scar20_color1);
+
+		scar20_color2.setup(XOR("color 2"), XOR("scar20_color2"), colors::white);
+		scar20_color2.SetCallback(callbacks::SkinUpdate);
+		scar20_color2.AddShowCallback(callbacks::SCAR20);
+		RegisterElement(&scar20_color2);
+
+		scar20_color3.setup(XOR("color 3"), XOR("scar20_color3"), colors::white);
+		scar20_color3.SetCallback(callbacks::SkinUpdate);
+		scar20_color3.AddShowCallback(callbacks::SCAR20);
+		RegisterElement(&scar20_color3);
+
+		id_sg553.setup(XOR("paintkit id"), XOR("id_sg553"), 3);
+		id_sg553.SetCallback(callbacks::SkinUpdate);
+		id_sg553.AddShowCallback(callbacks::SG553);
+		RegisterElement(&id_sg553);
+
+		stattrak_sg553.setup(XOR("stattrak"), XOR("stattrak_sg553"));
+		stattrak_sg553.SetCallback(callbacks::SkinUpdate);
+		stattrak_sg553.AddShowCallback(callbacks::SG553);
+		RegisterElement(&stattrak_sg553);
+
+		quality_sg553.setup(XOR("quality"), XOR("quality_sg553"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_sg553.SetCallback(callbacks::SkinUpdate);
+		quality_sg553.AddShowCallback(callbacks::SG553);
+		RegisterElement(&quality_sg553);
+
+		seed_sg553.setup(XOR("seed"), XOR("seed_sg553"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_sg553.SetCallback(callbacks::SkinUpdate);
+		seed_sg553.AddShowCallback(callbacks::SG553);
+		RegisterElement(&seed_sg553);
+
+		id_ssg08.setup(XOR("paintkit id"), XOR("id_ssg08"), 3);
+		id_ssg08.SetCallback(callbacks::SkinUpdate);
+		id_ssg08.AddShowCallback(callbacks::SSG08);
+		RegisterElement(&id_ssg08);
+
+		stattrak_ssg08.setup(XOR("stattrak"), XOR("stattrak_ssg08"));
+		stattrak_ssg08.SetCallback(callbacks::SkinUpdate);
+		stattrak_ssg08.AddShowCallback(callbacks::SSG08);
+		RegisterElement(&stattrak_ssg08);
+
+		quality_ssg08.setup(XOR("quality"), XOR("quality_ssg08"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_ssg08.SetCallback(callbacks::SkinUpdate);
+		quality_ssg08.AddShowCallback(callbacks::SSG08);
+		RegisterElement(&quality_ssg08);
+
+		seed_ssg08.setup(XOR("seed"), XOR("seed_ssg08"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_ssg08.SetCallback(callbacks::SkinUpdate);
+		seed_ssg08.AddShowCallback(callbacks::SSG08);
+		RegisterElement(&seed_ssg08);
+
+		ssg08_color.setup(XOR("color"), XOR("ssg08_color"), colors::white);
+		ssg08_color.SetCallback(callbacks::SkinUpdate);
+		ssg08_color.AddShowCallback(callbacks::SSG08);
+		RegisterElement(&ssg08_color);
+
+		ssg08_color1.setup(XOR("color 1"), XOR("ssg08_color1"), colors::white);
+		ssg08_color1.SetCallback(callbacks::SkinUpdate);
+		ssg08_color1.AddShowCallback(callbacks::SSG08);
+		RegisterElement(&ssg08_color1);
+
+		ssg08_color2.setup(XOR("color 2"), XOR("ssg08_color2"), colors::white);
+		ssg08_color2.SetCallback(callbacks::SkinUpdate);
+		ssg08_color2.AddShowCallback(callbacks::SSG08);
+		RegisterElement(&ssg08_color2);
+
+		ssg08_color3.setup(XOR("color 3"), XOR("ssg08_color3"), colors::white);
+		ssg08_color3.SetCallback(callbacks::SkinUpdate);
+		ssg08_color3.AddShowCallback(callbacks::SSG08);
+		RegisterElement(&ssg08_color3);
+
+		id_m4a1s.setup(XOR("paintkit id"), XOR("id_m4a1s"), 3);
+		id_m4a1s.SetCallback(callbacks::SkinUpdate);
+		id_m4a1s.AddShowCallback(callbacks::M4A1S);
+		RegisterElement(&id_m4a1s);
+
+		stattrak_m4a1s.setup(XOR("stattrak"), XOR("stattrak_m4a1s"));
+		stattrak_m4a1s.SetCallback(callbacks::SkinUpdate);
+		stattrak_m4a1s.AddShowCallback(callbacks::M4A1S);
+		RegisterElement(&stattrak_m4a1s);
+
+		quality_m4a1s.setup(XOR("quality"), XOR("quality_m4a1s"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_m4a1s.SetCallback(callbacks::SkinUpdate);
+		quality_m4a1s.AddShowCallback(callbacks::M4A1S);
+		RegisterElement(&quality_m4a1s);
+
+		seed_m4a1s.setup(XOR("seed"), XOR("seed_m4a1s"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_m4a1s.SetCallback(callbacks::SkinUpdate);
+		seed_m4a1s.AddShowCallback(callbacks::M4A1S);
+		RegisterElement(&seed_m4a1s);
+
+		id_usps.setup(XOR("paintkit id"), XOR("id_usps"), 3);
+		id_usps.SetCallback(callbacks::SkinUpdate);
+		id_usps.AddShowCallback(callbacks::USPS);
+		RegisterElement(&id_usps);
+
+		stattrak_usps.setup(XOR("stattrak"), XOR("stattrak_usps"));
+		stattrak_usps.SetCallback(callbacks::SkinUpdate);
+		stattrak_usps.AddShowCallback(callbacks::USPS);
+		RegisterElement(&stattrak_usps);
+
+		quality_usps.setup(XOR("quality"), XOR("quality_usps"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_usps.SetCallback(callbacks::SkinUpdate);
+		quality_usps.AddShowCallback(callbacks::USPS);
+		RegisterElement(&quality_usps);
+
+		seed_usps.setup(XOR("seed"), XOR("seed_usps"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_usps.SetCallback(callbacks::SkinUpdate);
+		seed_usps.AddShowCallback(callbacks::USPS);
+		RegisterElement(&seed_usps);
+
+		id_cz75a.setup(XOR("paintkit id"), XOR("id_cz75a"), 3);
+		id_cz75a.SetCallback(callbacks::SkinUpdate);
+		id_cz75a.AddShowCallback(callbacks::CZ75A);
+		RegisterElement(&id_cz75a);
+
+		stattrak_cz75a.setup(XOR("stattrak"), XOR("stattrak_cz75a"));
+		stattrak_cz75a.SetCallback(callbacks::SkinUpdate);
+		stattrak_cz75a.AddShowCallback(callbacks::CZ75A);
+		RegisterElement(&stattrak_cz75a);
+
+		quality_cz75a.setup(XOR("quality"), XOR("quality_cz75a"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_cz75a.SetCallback(callbacks::SkinUpdate);
+		quality_cz75a.AddShowCallback(callbacks::CZ75A);
+		RegisterElement(&quality_cz75a);
+
+		seed_cz75a.setup(XOR("seed"), XOR("seed_cz75a"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_cz75a.SetCallback(callbacks::SkinUpdate);
+		seed_cz75a.AddShowCallback(callbacks::CZ75A);
+		RegisterElement(&seed_cz75a);
+
+		id_revolver.setup(XOR("paintkit id"), XOR("id_revolver"), 3);
+		id_revolver.SetCallback(callbacks::SkinUpdate);
+		id_revolver.AddShowCallback(callbacks::REVOLVER);
+		RegisterElement(&id_revolver);
+
+		stattrak_revolver.setup(XOR("stattrak"), XOR("stattrak_revolver"));
+		stattrak_revolver.SetCallback(callbacks::SkinUpdate);
+		stattrak_revolver.AddShowCallback(callbacks::REVOLVER);
+		RegisterElement(&stattrak_revolver);
+
+		quality_revolver.setup(XOR("quality"), XOR("quality_revolver"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_revolver.SetCallback(callbacks::SkinUpdate);
+		quality_revolver.AddShowCallback(callbacks::REVOLVER);
+		RegisterElement(&quality_revolver);
+
+		seed_revolver.setup(XOR("seed"), XOR("seed_revolver"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_revolver.SetCallback(callbacks::SkinUpdate);
+		seed_revolver.AddShowCallback(callbacks::REVOLVER);
+		RegisterElement(&seed_revolver);
+
+		id_bayonet.setup(XOR("paintkit id"), XOR("id_bayonet"), 3);
+		id_bayonet.SetCallback(callbacks::SkinUpdate);
+		id_bayonet.AddShowCallback(callbacks::KNIFE_BAYONET);
+		RegisterElement(&id_bayonet);
+
+		stattrak_bayonet.setup(XOR("stattrak"), XOR("stattrak_bayonet"));
+		stattrak_bayonet.SetCallback(callbacks::SkinUpdate);
+		stattrak_bayonet.AddShowCallback(callbacks::KNIFE_BAYONET);
+		RegisterElement(&stattrak_bayonet);
+
+		quality_bayonet.setup(XOR("quality"), XOR("quality_bayonet"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_bayonet.SetCallback(callbacks::SkinUpdate);
+		quality_bayonet.AddShowCallback(callbacks::KNIFE_BAYONET);
+		RegisterElement(&quality_bayonet);
+
+		seed_bayonet.setup(XOR("seed"), XOR("seed_bayonet"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_bayonet.SetCallback(callbacks::SkinUpdate);
+		seed_bayonet.AddShowCallback(callbacks::KNIFE_BAYONET);
+		RegisterElement(&seed_bayonet);
+
+		id_flip.setup(XOR("paintkit id"), XOR("id_flip"), 3);
+		id_flip.SetCallback(callbacks::SkinUpdate);
+		id_flip.AddShowCallback(callbacks::KNIFE_FLIP);
+		RegisterElement(&id_flip);
+
+		stattrak_flip.setup(XOR("stattrak"), XOR("stattrak_flip"));
+		stattrak_flip.SetCallback(callbacks::SkinUpdate);
+		stattrak_flip.AddShowCallback(callbacks::KNIFE_FLIP);
+		RegisterElement(&stattrak_flip);
+
+		quality_flip.setup(XOR("quality"), XOR("quality_flip"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_flip.SetCallback(callbacks::SkinUpdate);
+		quality_flip.AddShowCallback(callbacks::KNIFE_FLIP);
+		RegisterElement(&quality_flip);
+
+		seed_flip.setup(XOR("seed"), XOR("seed_flip"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_flip.SetCallback(callbacks::SkinUpdate);
+		seed_flip.AddShowCallback(callbacks::KNIFE_FLIP);
+		RegisterElement(&seed_flip);
+
+		id_gut.setup(XOR("paintkit id"), XOR("id_gut"), 3);
+		id_gut.SetCallback(callbacks::SkinUpdate);
+		id_gut.AddShowCallback(callbacks::KNIFE_GUT);
+		RegisterElement(&id_gut);
+
+		stattrak_gut.setup(XOR("stattrak"), XOR("stattrak_gut"));
+		stattrak_gut.SetCallback(callbacks::SkinUpdate);
+		stattrak_gut.AddShowCallback(callbacks::KNIFE_GUT);
+		RegisterElement(&stattrak_gut);
+
+		quality_gut.setup(XOR("quality"), XOR("quality_gut"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_gut.SetCallback(callbacks::SkinUpdate);
+		quality_gut.AddShowCallback(callbacks::KNIFE_GUT);
+		RegisterElement(&quality_gut);
+
+		seed_gut.setup(XOR("seed"), XOR("seed_gut"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_gut.SetCallback(callbacks::SkinUpdate);
+		seed_gut.AddShowCallback(callbacks::KNIFE_GUT);
+		RegisterElement(&seed_gut);
+
+		id_karambit.setup(XOR("paintkit id"), XOR("id_karambit"), 3);
+		id_karambit.SetCallback(callbacks::SkinUpdate);
+		id_karambit.AddShowCallback(callbacks::KNIFE_KARAMBIT);
+		RegisterElement(&id_karambit);
+
+		stattrak_karambit.setup(XOR("stattrak"), XOR("stattrak_karambit"));
+		stattrak_karambit.SetCallback(callbacks::SkinUpdate);
+		stattrak_karambit.AddShowCallback(callbacks::KNIFE_KARAMBIT);
+		RegisterElement(&stattrak_karambit);
+
+		quality_karambit.setup(XOR("quality"), XOR("quality_karambit"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_karambit.SetCallback(callbacks::SkinUpdate);
+		quality_karambit.AddShowCallback(callbacks::KNIFE_KARAMBIT);
+		RegisterElement(&quality_karambit);
+
+		seed_karambit.setup(XOR("seed"), XOR("seed_karambit"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_karambit.SetCallback(callbacks::SkinUpdate);
+		seed_karambit.AddShowCallback(callbacks::KNIFE_KARAMBIT);
+		RegisterElement(&seed_karambit);
+
+		id_m9.setup(XOR("paintkit id"), XOR("id_m9"), 3);
+		id_m9.SetCallback(callbacks::SkinUpdate);
+		id_m9.AddShowCallback(callbacks::KNIFE_M9_BAYONET);
+		RegisterElement(&id_m9);
+
+		stattrak_m9.setup(XOR("stattrak"), XOR("stattrak_m9"));
+		stattrak_m9.SetCallback(callbacks::SkinUpdate);
+		stattrak_m9.AddShowCallback(callbacks::KNIFE_M9_BAYONET);
+		RegisterElement(&stattrak_m9);
+
+		quality_m9.setup(XOR("quality"), XOR("quality_m9"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_m9.SetCallback(callbacks::SkinUpdate);
+		quality_m9.AddShowCallback(callbacks::KNIFE_M9_BAYONET);
+		RegisterElement(&quality_m9);
+
+		seed_m9.setup(XOR("seed"), XOR("seed_m9"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_m9.SetCallback(callbacks::SkinUpdate);
+		seed_m9.AddShowCallback(callbacks::KNIFE_M9_BAYONET);
+		RegisterElement(&seed_m9);
+
+		id_huntsman.setup(XOR("paintkit id"), XOR("id_huntsman"), 3);
+		id_huntsman.SetCallback(callbacks::SkinUpdate);
+		id_huntsman.AddShowCallback(callbacks::KNIFE_HUNTSMAN);
+		RegisterElement(&id_huntsman);
+
+		stattrak_huntsman.setup(XOR("stattrak"), XOR("stattrak_huntsman"));
+		stattrak_huntsman.SetCallback(callbacks::SkinUpdate);
+		stattrak_huntsman.AddShowCallback(callbacks::KNIFE_HUNTSMAN);
+		RegisterElement(&stattrak_huntsman);
+
+		quality_huntsman.setup(XOR("quality"), XOR("quality_huntsman"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_huntsman.SetCallback(callbacks::SkinUpdate);
+		quality_huntsman.AddShowCallback(callbacks::KNIFE_HUNTSMAN);
+		RegisterElement(&quality_huntsman);
+
+		seed_huntsman.setup(XOR("seed"), XOR("seed_huntsman"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_huntsman.SetCallback(callbacks::SkinUpdate);
+		seed_huntsman.AddShowCallback(callbacks::KNIFE_HUNTSMAN);
+		RegisterElement(&seed_huntsman);
+
+		id_falchion.setup(XOR("paintkit id"), XOR("id_falchion"), 3);
+		id_falchion.SetCallback(callbacks::SkinUpdate);
+		id_falchion.AddShowCallback(callbacks::KNIFE_FALCHION);
+		RegisterElement(&id_falchion);
+
+		stattrak_falchion.setup(XOR("stattrak"), XOR("stattrak_falchion"));
+		stattrak_falchion.SetCallback(callbacks::SkinUpdate);
+		stattrak_falchion.AddShowCallback(callbacks::KNIFE_FALCHION);
+		RegisterElement(&stattrak_falchion);
+
+		quality_falchion.setup(XOR("quality"), XOR("quality_falchion"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_falchion.SetCallback(callbacks::SkinUpdate);
+		quality_falchion.AddShowCallback(callbacks::KNIFE_FALCHION);
+		RegisterElement(&quality_falchion);
+
+		seed_falchion.setup(XOR("seed"), XOR("seed_falchion"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_falchion.SetCallback(callbacks::SkinUpdate);
+		seed_falchion.AddShowCallback(callbacks::KNIFE_FALCHION);
+		RegisterElement(&seed_falchion);
+
+		id_bowie.setup(XOR("paintkit id"), XOR("id_bowie"), 3);
+		id_bowie.SetCallback(callbacks::SkinUpdate);
+		id_bowie.AddShowCallback(callbacks::KNIFE_BOWIE);
+		RegisterElement(&id_bowie);
+
+		stattrak_bowie.setup(XOR("stattrak"), XOR("stattrak_bowie"));
+		stattrak_bowie.SetCallback(callbacks::SkinUpdate);
+		stattrak_bowie.AddShowCallback(callbacks::KNIFE_BOWIE);
+		RegisterElement(&stattrak_bowie);
+
+		quality_bowie.setup(XOR("quality"), XOR("quality_bowie"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_bowie.SetCallback(callbacks::SkinUpdate);
+		quality_bowie.AddShowCallback(callbacks::KNIFE_BOWIE);
+		RegisterElement(&quality_bowie);
+
+		seed_bowie.setup(XOR("seed"), XOR("seed_bowie"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_bowie.SetCallback(callbacks::SkinUpdate);
+		seed_bowie.AddShowCallback(callbacks::KNIFE_BOWIE);
+		RegisterElement(&seed_bowie);
+
+		id_butterfly.setup(XOR("paintkit id"), XOR("id_butterfly"), 3);
+		id_butterfly.SetCallback(callbacks::SkinUpdate);
+		id_butterfly.AddShowCallback(callbacks::KNIFE_BUTTERFLY);
+		RegisterElement(&id_butterfly);
+
+		stattrak_butterfly.setup(XOR("stattrak"), XOR("stattrak_butterfly"));
+		stattrak_butterfly.SetCallback(callbacks::SkinUpdate);
+		stattrak_butterfly.AddShowCallback(callbacks::KNIFE_BUTTERFLY);
+		RegisterElement(&stattrak_butterfly);
+
+		quality_butterfly.setup(XOR("quality"), XOR("quality_butterfly"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_butterfly.SetCallback(callbacks::SkinUpdate);
+		quality_butterfly.AddShowCallback(callbacks::KNIFE_BUTTERFLY);
+		RegisterElement(&quality_butterfly);
+
+		seed_butterfly.setup(XOR("seed"), XOR("seed_butterfly"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_butterfly.SetCallback(callbacks::SkinUpdate);
+		seed_butterfly.AddShowCallback(callbacks::KNIFE_BUTTERFLY);
+		RegisterElement(&seed_butterfly);
+
+		id_daggers.setup(XOR("paintkit id"), XOR("id_daggers"), 3);
+		id_daggers.SetCallback(callbacks::SkinUpdate);
+		id_daggers.AddShowCallback(callbacks::KNIFE_SHADOW_DAGGERS);
+		RegisterElement(&id_daggers);
+
+		stattrak_daggers.setup(XOR("stattrak"), XOR("stattrak_daggers"));
+		stattrak_daggers.SetCallback(callbacks::SkinUpdate);
+		stattrak_daggers.AddShowCallback(callbacks::KNIFE_SHADOW_DAGGERS);
+		RegisterElement(&stattrak_daggers);
+
+		quality_daggers.setup(XOR("quality"), XOR("quality_daggers"), 1.f, 100.f, true, 0, 100.f, 1.f, XOR(L"%"));
+		quality_daggers.SetCallback(callbacks::SkinUpdate);
+		quality_daggers.AddShowCallback(callbacks::KNIFE_SHADOW_DAGGERS);
+		RegisterElement(&quality_daggers);
+
+		seed_daggers.setup(XOR("seed"), XOR("seed_daggers"), 0.f, 255.f, true, 0, 0.f, 1.f);
+		seed_daggers.SetCallback(callbacks::SkinUpdate);
+		seed_daggers.AddShowCallback(callbacks::KNIFE_SHADOW_DAGGERS);
+		RegisterElement(&seed_daggers);
 
 		// col 2.
-		knife.setup( XOR( "knife model" ), XOR( "skins_knife_model" ), { XOR( "off" ), XOR( "bayonet" ), XOR( "bowie" ), XOR( "butterfly" ), XOR( "falchion" ), XOR( "flip" ), XOR( "gut" ), XOR( "huntsman" ), XOR( "karambit" ), XOR( "m9 bayonet" ), XOR( "daggers" ) } );
-		knife.SetCallback( callbacks::SkinUpdate );
-		RegisterElement( &knife, 1 );
+		knife.setup(XOR("knife model"), XOR("skins_knife_model"), { XOR("off"), XOR("bayonet"), XOR("bowie"), XOR("butterfly"), XOR("falchion"), XOR("flip"), XOR("gut"), XOR("huntsman"), XOR("karambit"), XOR("m9 bayonet"), XOR("daggers") });
+		knife.SetCallback(callbacks::SkinUpdate);
+		RegisterElement(&knife, 1);
 
-		glove.setup( XOR( "glove model" ), XOR( "skins_glove_model" ), { XOR( "off" ), XOR( "bloodhound" ), XOR( "sport" ), XOR( "driver" ), XOR( "handwraps" ), XOR( "moto" ), XOR( "specialist" ) } );
-		glove.SetCallback( callbacks::ForceFullUpdate );
-		RegisterElement( &glove, 1 );
+		glove.setup(XOR("glove model"), XOR("skins_glove_model"), { XOR("off"), XOR("bloodhound"), XOR("sport"), XOR("driver"), XOR("handwraps"), XOR("moto"), XOR("specialist") });
+		glove.SetCallback(callbacks::ForceFullUpdate);
+		RegisterElement(&glove, 1);
 
-		glove_id.setup( XOR( "glove paintkit id" ), XOR( "skins_glove_id" ), 2 );
-		glove_id.SetCallback( callbacks::ForceFullUpdate );
-		RegisterElement( &glove_id, 1 );
+		glove_id.setup(XOR("glove paintkit id"), XOR("skins_glove_id"), 2);
+		glove_id.SetCallback(callbacks::ForceFullUpdate);
+		RegisterElement(&glove_id, 1);
 	}
 };
 

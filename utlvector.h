@@ -22,6 +22,8 @@ public:
 		return count;
 	}
 
+
+
 	__forceinline void Grow(int count = 1) {
 		if (IsExternallyAllocated())
 			return;
@@ -110,6 +112,8 @@ public:
 
 		return elem;
 	}
+
+
 
 protected:
 	__forceinline void GrowVector(int num = 1) {
@@ -386,6 +390,8 @@ protected:
 	T* m_elements;
 };
 
+
+
 template< typename T, class A >
 T& c_utl_vector< T, A >::operator[](int i) {
 	assert(i < m_size);
@@ -397,3 +403,114 @@ const T& c_utl_vector< T, A >::operator[](int i) const {
 	assert(i < m_size);
 	return m_memory[i];
 }
+
+template <typename K, typename T, typename I = int>
+class CUtlMap
+{
+public:
+	using LessFunc_t = bool(__cdecl*)(const K&, const K&);
+
+	T& operator[](I i)
+	{
+		return m_Tree.Element(i).Element;
+	}
+
+	K& Key(I i)
+	{
+		return m_Tree.Element(i).Key;
+	}
+
+	const K& Key(I i) const
+	{
+		return m_Tree.Element(i).Key;
+	}
+
+	I MaxElement() const
+	{
+		return m_Tree.MaxElement();
+	}
+
+	bool IsValidIndex(I i) const
+	{
+		return m_Tree.IsValidIndex(i);
+	}
+
+	I Find(const K& Key) const
+	{
+		Node_t Dummy;
+		Dummy.Key = Key;
+		return m_Tree.Find(Dummy);
+	}
+
+	I FirstInorder() const
+	{
+		return m_Tree.FirstInorder();
+	}
+
+	I NextInorder(I i) const
+	{
+		return m_Tree.NextInorder(i);
+	}
+
+	struct Node_t
+	{
+		K Key;
+		T Element;
+	};
+
+	class CKeyLess
+	{
+	public:
+		explicit CKeyLess(LessFunc_t lessFunc) : m_LessFunc(lessFunc) {}
+
+		bool operator!() const
+		{
+			return !m_LessFunc;
+		}
+
+		bool operator()(const Node_t& left, const Node_t& right) const
+		{
+			return m_LessFunc(left.Key, right.Key);
+		}
+
+		LessFunc_t m_LessFunc;
+	};
+
+protected:
+	//CUtlRBTree<Node_t, I, CKeyLess> m_Tree;
+};
+
+template <typename K, typename T, typename I = int>
+class CUtlHashMapLarge : public CUtlMap<K, T, I> // I'm pretty sure this doesn't inhernit from CUtlMap but for what I'm doing it's good enough
+{
+public:
+	I Find(const K& Key) const // Temporary. Valve uses MurmurHash3.
+	{
+		FOR_EACH_MAP_FAST(*this, i)
+		{
+			if (this->Key(i) == Key)
+				return i;
+		}
+
+		return -1;
+	}
+};
+
+template <class T, class A = CUtlMemory<T>>
+class CCopyableUtlVector : public CUtlVector<T, A>
+{
+public:
+	virtual ~CCopyableUtlVector();
+};
+
+class CUtlString
+{
+public:
+	char* Get() const
+	{
+		//return reinterpret_cast<char*>(m_Memory.m_pMemory);
+	}
+
+	CUtlMemory<unsigned char> m_Memory;
+	int m_nActualLength;
+};

@@ -144,6 +144,7 @@ public:
 	int    m_frame_shit;
 	bool   m_ground;
 	bool   m_lagcomp;
+	bool m_updating_paintkit;
 
 	std::vector<int> cheese;
 	std::vector<int> kaaba;

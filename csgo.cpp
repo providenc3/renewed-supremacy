@@ -76,6 +76,7 @@ bool CSGO::init( ) {
 	Interfaces interfaces{};
 
 	// get interface pointers.
+	addr = pattern::find(g_csgo.m_client_dll, XOR("E8 ? ? ? ? FF 76 0C 8D 48 04 E8")).as<uintptr_t>();
 	m_client             = interfaces.get< CHLClient* >( HASH( "VClient" ) );
 	m_cvar               = interfaces.get< ICvar* >( HASH( "VEngineCvar" ) );
 	m_engine             = interfaces.get< IVEngineClient* >( HASH( "VEngineClient" ) );

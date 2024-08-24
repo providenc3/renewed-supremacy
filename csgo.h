@@ -176,6 +176,7 @@ public:
 	size_t PlayerAnimState;
 	size_t studioHdr;
 	size_t postproc;
+	uintptr_t addr;
 
 	Address UTIL_TraceLine;
 	Address CTraceFilterSimple_vmt;
