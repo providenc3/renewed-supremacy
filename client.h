@@ -134,6 +134,7 @@ public:
 
 	// animation variables.
 	ang_t  m_angle;
+	ang_t  m_hidden_angle;
 	ang_t  m_rotation;
 	ang_t  m_radar;
 	float  m_body;

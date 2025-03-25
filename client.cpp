@@ -645,6 +645,20 @@ void Client::UpdateInformation() {
 		return;
 	}
 
+	// save angles if not flicking
+	if (m_anim_time < g_cl.m_body_pred)
+		m_hidden_angle = g_cl.m_cmd->m_view_angles;
+
+	// current angle will be animated.
+	
+	if (m_anim_time >= m_body_pred && g_hvh.m_mode == AntiAimMode::STAND)
+	{
+		m_angle = m_hidden_angle;
+	}
+	else
+		m_angle = g_cl.m_cmd->m_view_angles;
+	
+
 	CCSGOPlayerAnimState* state = g_cl.m_local->m_PlayerAnimState();
 	if (!state)
 		return;
